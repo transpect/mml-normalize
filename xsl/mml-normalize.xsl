@@ -55,9 +55,9 @@
   
   <!-- resolve empty mi, mn, mo -->
   
-  <xsl:template match="mi[not(normalize-space(.))]
-                      |mo[not(normalize-space(.))]
-                      |mn[not(normalize-space(.))]" mode="mml2tex-preprocess"/>
+  <xsl:template match="mi[not(normalize-space(.)) and not(processing-instruction())]
+                      |mo[not(normalize-space(.)) and not(processing-instruction())]
+                      |mn[not(normalize-space(.)) and not(processing-instruction())]" mode="mml2tex-preprocess"/>
   
   <!-- resolve msubsup if superscript and subscript is empty -->
   
@@ -258,7 +258,7 @@
   
   <xsl:template match="*|@*|processing-instruction()" mode="mml2tex-grouping mml2tex-preprocess">
     <xsl:copy>
-      <xsl:apply-templates select="@*|node()" mode="#current"/>
+      <xsl:apply-templates select="@*|node()|processing-instruction()" mode="#current"/>
     </xsl:copy>
   </xsl:template>
   
