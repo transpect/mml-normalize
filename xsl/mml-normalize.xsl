@@ -98,7 +98,7 @@
 		       |msub[count(*) gt 2]" mode="mml2tex-preprocess">
     <xsl:copy>
       <xsl:apply-templates select="@*" mode="#current"/>
-      <mrow>
+      <mrow xmlns="http://www.w3.org/1998/Math/MathML">
         <xsl:apply-templates select="*[not(position() eq last())]" mode="#current"/>
       </mrow>
       <xsl:apply-templates select="*[position() eq last()]" mode="#current"/>
@@ -162,101 +162,103 @@
   <!-- to-do group mtext in 1st mode and text heurstics in another mode or try matching to mtext/text() -->
   
   <xsl:template match="mtext" mode="mml2tex-preprocess">
-    <xsl:variable name="parent" select="parent::*" as="element()"/>
-    <xsl:variable name="regular-words-regex" select="'(\p{L}\p{L}+)([-\s]\p{L}\p{L}+)+\s*'" as="xs:string"/>
-    <xsl:analyze-string select="." regex="{$regular-words-regex}">
-
-      <!-- preserve hyphenated words -->
-      <xsl:matching-substring>
-        <xsl:element name="{mml:gen-name($parent, 'mtext')}">
-          <xsl:value-of select="."/>
-        </xsl:element>
-      </xsl:matching-substring>
-      <xsl:non-matching-substring>
-    
-        <!-- tag operators -->
-        <xsl:analyze-string select="." regex="{$mml2tex:operators-regex}">
-          
-          <xsl:matching-substring>
-            <xsl:element name="{mml:gen-name($parent, 'mo')}">
-              <xsl:value-of select="normalize-space(.)"/>
-            </xsl:element>
-          </xsl:matching-substring>
-          <xsl:non-matching-substring>
+    <mrow xmlns="http://www.w3.org/1998/Math/MathML"> 
+      <xsl:variable name="parent" select="parent::*" as="element()"/>
+      <xsl:variable name="regular-words-regex" select="'(\p{L}\p{L}+)([-\s]\p{L}\p{L}+)+\s*'" as="xs:string"/>
+      <xsl:analyze-string select="." regex="{$regular-words-regex}">
+  
+        <!-- preserve hyphenated words -->
+        <xsl:matching-substring>
+          <xsl:element name="{mml:gen-name($parent, 'mtext')}">
+            <xsl:value-of select="."/>
+          </xsl:element>
+        </xsl:matching-substring>
+        <xsl:non-matching-substring>
+      
+          <!-- tag operators -->
+          <xsl:analyze-string select="." regex="{$mml2tex:operators-regex}">
             
-            <xsl:analyze-string select="." regex="{concat('(\s', $mi-regex, '\s)|(^\s?', $mi-regex, '\s?$)|(\s', $mi-regex, '$)|(^', $mi-regex, '\s)')}">
+            <xsl:matching-substring>
+              <xsl:element name="{mml:gen-name($parent, 'mo')}">
+                <xsl:value-of select="normalize-space(.)"/>
+              </xsl:element>
+            </xsl:matching-substring>
+            <xsl:non-matching-substring>
               
-              <!-- tag identifiers -->
-              <xsl:matching-substring>
-                <xsl:element name="{mml:gen-name($parent, 'mi')}">
-                  <xsl:attribute name="mathvariant" select="'normal'"/>
-                  <xsl:value-of select="normalize-space(.)"/>
-                </xsl:element>
-              </xsl:matching-substring>
-              <xsl:non-matching-substring>
+              <xsl:analyze-string select="." regex="{concat('(\s', $mi-regex, '\s)|(^\s?', $mi-regex, '\s?$)|(\s', $mi-regex, '$)|(^', $mi-regex, '\s)')}">
                 
-                <!-- tag numerical values -->
-                <xsl:analyze-string select="." regex="[0-9]+">
+                <!-- tag identifiers -->
+                <xsl:matching-substring>
+                  <xsl:element name="{mml:gen-name($parent, 'mi')}">
+                    <xsl:attribute name="mathvariant" select="'normal'"/>
+                    <xsl:value-of select="normalize-space(.)"/>
+                  </xsl:element>
+                </xsl:matching-substring>
+                <xsl:non-matching-substring>
                   
-                  <xsl:matching-substring>
-                    <xsl:element name="{mml:gen-name($parent, 'mn')}">
-                      <xsl:value-of select="normalize-space(.)"/>
-                    </xsl:element>
-                  </xsl:matching-substring>
-                  <xsl:non-matching-substring>
+                  <!-- tag numerical values -->
+                  <xsl:analyze-string select="." regex="[0-9]+">
                     
-                    <!-- tag derivates -->
-                    <xsl:analyze-string select="." regex="([a-zA-Z])(')+">
+                    <xsl:matching-substring>
+                      <xsl:element name="{mml:gen-name($parent, 'mn')}">
+                        <xsl:value-of select="normalize-space(.)"/>
+                      </xsl:element>
+                    </xsl:matching-substring>
+                    <xsl:non-matching-substring>
                       
-                      <xsl:matching-substring>
-                        <xsl:element name="{mml:gen-name($parent, 'mi')}">
-                          <xsl:attribute name="mathvariant" select="'normal'"/>
-                          <xsl:value-of select="regex-group(1)"/>
-                        </xsl:element>
-                        <xsl:element name="{mml:gen-name($parent, 'mo')}">
-                          <xsl:value-of select="regex-group(2)"/>
-                        </xsl:element>
-                      </xsl:matching-substring>
-                      
-                      <xsl:non-matching-substring>
+                      <!-- tag derivates -->
+                      <xsl:analyze-string select="." regex="([a-zA-Z])(')+">
                         
-                        <!-- tag greeks  -->
-                        <xsl:analyze-string select="." regex="[&#x391;-&#x3c9;]">
+                        <xsl:matching-substring>
+                          <xsl:element name="{mml:gen-name($parent, 'mi')}">
+                            <xsl:attribute name="mathvariant" select="'normal'"/>
+                            <xsl:value-of select="regex-group(1)"/>
+                          </xsl:element>
+                          <xsl:element name="{mml:gen-name($parent, 'mo')}">
+                            <xsl:value-of select="regex-group(2)"/>
+                          </xsl:element>
+                        </xsl:matching-substring>
+                        
+                        <xsl:non-matching-substring>
                           
-                          <xsl:matching-substring>
-                            <xsl:element name="{mml:gen-name($parent, 'mi')}">
-                              <xsl:attribute name="mathvariant" select="'normal'"/>
-                              <xsl:value-of select="normalize-space(.)"/>
-                            </xsl:element>
-                          </xsl:matching-substring>
-                          <xsl:non-matching-substring>
-                            <!-- map characters to mi -->
-                            <xsl:choose>
-                              <xsl:when test="string-length(normalize-space(.)) eq 1">
-                                <xsl:element name="{mml:gen-name($parent, 'mi')}">
-                                  <xsl:attribute name="mathvariant" select="'normal'"/>
-                                  <xsl:value-of select="normalize-space(.)"/>
-                                </xsl:element>
-                              </xsl:when>
-                              <xsl:when test="normalize-space(.)">
-                                <xsl:element name="{mml:gen-name($parent, 'mtext')}">
-                                  <xsl:value-of select="."/>
-                                </xsl:element>
-                              </xsl:when>
-                            </xsl:choose>
-                          </xsl:non-matching-substring>
-                          
-                        </xsl:analyze-string>
-                      </xsl:non-matching-substring>
-                    </xsl:analyze-string>
-                  </xsl:non-matching-substring>
-                </xsl:analyze-string>     
-              </xsl:non-matching-substring>
-            </xsl:analyze-string>
-          </xsl:non-matching-substring>
-        </xsl:analyze-string>
-      </xsl:non-matching-substring>
-    </xsl:analyze-string>
+                          <!-- tag greeks  -->
+                          <xsl:analyze-string select="." regex="[&#x391;-&#x3c9;]">
+                            
+                            <xsl:matching-substring>
+                              <xsl:element name="{mml:gen-name($parent, 'mi')}">
+                                <xsl:attribute name="mathvariant" select="'normal'"/>
+                                <xsl:value-of select="normalize-space(.)"/>
+                              </xsl:element>
+                            </xsl:matching-substring>
+                            <xsl:non-matching-substring>
+                              <!-- map characters to mi -->
+                              <xsl:choose>
+                                <xsl:when test="string-length(normalize-space(.)) eq 1">
+                                  <xsl:element name="{mml:gen-name($parent, 'mi')}">
+                                    <xsl:attribute name="mathvariant" select="'normal'"/>
+                                    <xsl:value-of select="normalize-space(.)"/>
+                                  </xsl:element>
+                                </xsl:when>
+                                <xsl:when test="normalize-space(.)">
+                                  <xsl:element name="{mml:gen-name($parent, 'mtext')}">
+                                    <xsl:value-of select="."/>
+                                  </xsl:element>
+                                </xsl:when>
+                              </xsl:choose>
+                            </xsl:non-matching-substring>
+                            
+                          </xsl:analyze-string>
+                        </xsl:non-matching-substring>
+                      </xsl:analyze-string>
+                    </xsl:non-matching-substring>
+                  </xsl:analyze-string>     
+                </xsl:non-matching-substring>
+              </xsl:analyze-string>
+            </xsl:non-matching-substring>
+          </xsl:analyze-string>
+        </xsl:non-matching-substring>
+      </xsl:analyze-string>
+    </mrow>
   </xsl:template>
   
   <xsl:function name="mml:gen-name" as="xs:string">
