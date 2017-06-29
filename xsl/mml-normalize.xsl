@@ -139,6 +139,16 @@
     <xsl:apply-templates select="mrow/*[position() gt 1]" mode="#current"/>
   </xsl:template>
   
+    <xsl:variable name="non-text-element-names" as="xs:string*"
+    select="('mfrac', 'mn', 'mo')"/>
+  
+  <xsl:template match="mtext[matches(., '^[\p{Zs}&#x200b;]+$')]
+                            [
+                              preceding-sibling::*[1][local-name() = $non-text-element-names]
+                              and
+                              following-sibling::*[1][local-name() = $non-text-element-names]
+                            ]" mode="mml2tex-preprocess"/>
+  
   <!-- wrap private use and non-unicode-characters in mglyph -->
   
   <xsl:template match="text()[matches(., '[&#xE000;-&#xF8FF;&#xF0000;-&#xFFFFF;&#x100000;-&#x10FFFF;]')]" mode="mml2tex-preprocess">
