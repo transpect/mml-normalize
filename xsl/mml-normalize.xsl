@@ -53,6 +53,25 @@
     </xsl:copy>
   </xsl:template>
   
+  <!-- conclude three single mo elements with the '.' character to horizontal ellipsis -->
+  <xsl:template match="mo[. = '.']
+                         [preceding-sibling::*[1]/self::mo[. = '.'][not(preceding-sibling::*[1]/self::mo[. = '.'])]]
+                         [following-sibling::*[1]/self::mo[. = '.'][not(following-sibling::*[1]/self::mo[. = '.'])]]" mode="mml2tex-preprocess">
+    <mo>
+      <xsl:value-of select="'&#x2026;'"/>
+    </mo>
+  </xsl:template>
+  <xsl:template match="  mo[. = '.']
+                           [not(following-sibling::*[1]/self::mo[. = '.'])]
+                           [preceding-sibling::*[1]/self::mo[. = '.']]
+                           [preceding-sibling::*[2]/self::mo[. = '.']]
+                           [not(preceding-sibling::*[3]/self::mo[. = '.'])]
+                       | mo[. = '.']
+                           [not(preceding-sibling::*[1]/self::mo[. = '.'])]
+                           [following-sibling::*[1]/self::mo[. = '.']]
+                           [following-sibling::*[2]/self::mo[. = '.']]
+                           [not(following-sibling::*[3]/self::mo[. = '.'])]" mode="mml2tex-preprocess"/>
+  
   <!-- resolve empty mi, mn, mo -->
   
   <xsl:template match="mi[not(normalize-space(.)) and not(processing-instruction())]
@@ -152,6 +171,11 @@
     </xsl:element>
   </xsl:template>
   
+  <xsl:variable name="non-whitespace-element-names" as="xs:string*"
+    select="('mn', 'mo')"/>
+  
+  <xsl:template match="mtext[matches(., '^\s+$')][preceding::node()[1]/ancestor-or-self::*[local-name() = $non-whitespace-element-names]][following::node()[1]/self::*[local-name() = $non-whitespace-element-names]]" mode="mml2tex-preprocess"/>
+  
   <xsl:template match="mtext[matches(., concat('^\s*', $mml2tex:operators-regex, '\s*$'))]" mode="mml2tex-preprocess"> 
     <xsl:element name="{mml:gen-name(parent::*, 'mo')}">
       <xsl:apply-templates select="@*" mode="#current"/>
@@ -162,7 +186,7 @@
   <!-- to-do group mtext in 1st mode and text heurstics in another mode or try matching to mtext/text() -->
   
   <xsl:template match="mtext" mode="mml2tex-preprocess">
-    <mrow xmlns="http://www.w3.org/1998/Math/MathML"> 
+    <xsl:variable name="new-mathml" as="element()+ ">
       <xsl:variable name="parent" select="parent::*" as="element()"/>
       <xsl:variable name="regular-words-regex" select="'(\p{L}\p{L}+)([-\s]\p{L}\p{L}+)+\s*'" as="xs:string"/>
       <xsl:analyze-string select="." regex="{$regular-words-regex}">
@@ -258,7 +282,17 @@
           </xsl:analyze-string>
         </xsl:non-matching-substring>
       </xsl:analyze-string>
-    </mrow>
+    </xsl:variable>
+    <xsl:choose>
+      <xsl:when test="count($new-mathml) gt 1">
+        <mrow xmlns="http://www.w3.org/1998/Math/MathML">
+          <xsl:sequence select="$new-mathml"/>
+        </mrow>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:sequence select="$new-mathml"/>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
   
   <xsl:function name="mml:gen-name" as="xs:string">
