@@ -15,6 +15,8 @@
   <xsl:import href="operators.xsl"/>
   <xsl:import href="function-names.xsl"/>
   
+  <xsl:param name="whitespace-regex" select="'[\s&#x2000;-&#x200b;]'"/>
+  
   <xsl:template match="mml:math[every $i in .//mml:* 
                                 satisfies (string-length(normalize-space($i)) eq 0 and not($i/@*))]
                        |//processing-instruction('mathtype')[string-length(normalize-space(replace(., '\$', ''))) eq 0]" mode="mml2tex-preprocess">
@@ -168,6 +170,7 @@
   
   <xsl:template match="mtext[matches(., concat('^\s*', $mi-regex, '\s*$'))]" mode="mml2tex-preprocess">
     <xsl:element name="{mml:gen-name(parent::*, 'mi')}">
+      <xsl:attribute name="hurz3"></xsl:attribute>
       <xsl:attribute name="mathvariant" select="'normal'"/>
       <xsl:apply-templates select="@*" mode="#current"/>
       <xsl:value-of select="normalize-space(.)"/>
@@ -186,8 +189,9 @@
   
   <xsl:template match="mtext[matches(., '^\s+$')][preceding::node()[1]/ancestor-or-self::*[local-name() = $non-whitespace-element-names]][following::node()[1]/self::*[local-name() = $non-whitespace-element-names]]" mode="mml2tex-preprocess"/>
   
-  <xsl:template match="mtext[matches(., concat('^\s*', $mml2tex:operators-regex, '\s*$'))]" mode="mml2tex-preprocess"> 
+  <xsl:template match="mtext[matches(., concat('^\s*', $mml2tex:operators-regex, '\s*$'))][not(matches(., concat('^', $whitespace-regex, '+$')))]" mode="mml2tex-preprocess">
     <xsl:element name="{mml:gen-name(parent::*, 'mo')}">
+      <xsl:attribute name="hurz4"></xsl:attribute>
       <xsl:apply-templates select="@*" mode="#current"/>
       <xsl:value-of select="normalize-space(.)"/>
     </xsl:element>
@@ -195,7 +199,7 @@
   
   <!-- to-do group mtext in 1st mode and text heurstics in another mode or try matching to mtext/text() -->
   
-  <xsl:template match="mtext" mode="mml2tex-preprocess">
+  <xsl:template match="mtext[not(matches(., concat('^', $whitespace-regex, '+$')))]" mode="mml2tex-preprocess">
     <xsl:variable name="new-mathml" as="element()+ ">
       <xsl:variable name="parent" select="parent::*" as="element()"/>
       <xsl:variable name="regular-words-regex" select="'(\p{L}\p{L}+)([-\s]\p{L}\p{L}+)+\s*'" as="xs:string"/>
@@ -214,6 +218,7 @@
             
             <xsl:matching-substring>
               <xsl:element name="{mml:gen-name($parent, 'mo')}">
+                <xsl:attribute name="hurz2"/>
                 <xsl:value-of select="normalize-space(.)"/>
               </xsl:element>
             </xsl:matching-substring>
@@ -249,6 +254,7 @@
                             <xsl:value-of select="regex-group(1)"/>
                           </xsl:element>
                           <xsl:element name="{mml:gen-name($parent, 'mo')}">
+                            <xsl:attribute name="hurz1"/>
                             <xsl:value-of select="regex-group(2)"/>
                           </xsl:element>
                         </xsl:matching-substring>
