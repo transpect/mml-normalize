@@ -170,7 +170,6 @@
   
   <xsl:template match="mtext[matches(., concat('^\s*', $mi-regex, '\s*$'))]" mode="mml2tex-preprocess">
     <xsl:element name="{mml:gen-name(parent::*, 'mi')}">
-      <xsl:attribute name="hurz3"></xsl:attribute>
       <xsl:attribute name="mathvariant" select="'normal'"/>
       <xsl:apply-templates select="@*" mode="#current"/>
       <xsl:value-of select="normalize-space(.)"/>
@@ -191,7 +190,6 @@
   
   <xsl:template match="mtext[matches(., concat('^\s*', $mml2tex:operators-regex, '\s*$'))][not(matches(., concat('^', $whitespace-regex, '+$')))]" mode="mml2tex-preprocess">
     <xsl:element name="{mml:gen-name(parent::*, 'mo')}">
-      <xsl:attribute name="hurz4"></xsl:attribute>
       <xsl:apply-templates select="@*" mode="#current"/>
       <xsl:value-of select="normalize-space(.)"/>
     </xsl:element>
@@ -218,7 +216,6 @@
             
             <xsl:matching-substring>
               <xsl:element name="{mml:gen-name($parent, 'mo')}">
-                <xsl:attribute name="hurz2"/>
                 <xsl:value-of select="normalize-space(.)"/>
               </xsl:element>
             </xsl:matching-substring>
@@ -254,7 +251,6 @@
                             <xsl:value-of select="regex-group(1)"/>
                           </xsl:element>
                           <xsl:element name="{mml:gen-name($parent, 'mo')}">
-                            <xsl:attribute name="hurz1"/>
                             <xsl:value-of select="regex-group(2)"/>
                           </xsl:element>
                         </xsl:matching-substring>
