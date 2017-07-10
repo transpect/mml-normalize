@@ -15,7 +15,7 @@
   <xsl:import href="operators.xsl"/>
   <xsl:import href="function-names.xsl"/>
   
-  <xsl:param name="whitespace-regex" select="'[\s&#x2000;-&#x200b;]'"/>
+  <xsl:variable name="whitespace-regex" select="'[\s&#x2000;-&#x200b;]'" as="xs:string"/>
   
   <xsl:template match="mml:math[every $i in .//mml:* 
                                 satisfies (string-length(normalize-space($i)) eq 0 and not($i/@*))]
@@ -183,10 +183,11 @@
     </xsl:element>
   </xsl:template>
   
-  <xsl:variable name="non-whitespace-element-names" as="xs:string*"
-    select="('mn', 'mo')"/>
+  <xsl:variable name="non-whitespace-element-names" select="('mn', 'mo')" as="xs:string+"/>
   
-  <xsl:template match="mtext[matches(., '^\s+$')][preceding::node()[1]/ancestor-or-self::*[local-name() = $non-whitespace-element-names]][following::node()[1]/self::*[local-name() = $non-whitespace-element-names]]" mode="mml2tex-preprocess"/>
+  <xsl:template match="mtext[matches(., concat('^', $whitespace-regex, '+$'))]
+                            [preceding::node()[1]/ancestor-or-self::*[local-name() = $non-whitespace-element-names] or
+                             following::node()[1]/self::*[local-name() = $non-whitespace-element-names]]" mode="mml2tex-preprocess"/>
   
   <xsl:template match="mtext[matches(., concat('^\s*', $mml2tex:operators-regex, '\s*$'))][not(matches(., concat('^', $whitespace-regex, '+$')))]" mode="mml2tex-preprocess">
     <xsl:element name="{mml:gen-name(parent::*, 'mo')}">
