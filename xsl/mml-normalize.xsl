@@ -28,23 +28,26 @@
         * group adjacent mi and mtext tags with equivalent attributes
         * -->
   
-  <xsl:template match="*[count(mi) gt 1 or count(mtext) gt 1]" mode="mml2tex-grouping">
+  <xsl:template match="*[count(mi) gt 1 or count(mtext) gt 1]
+                        [not(self::msup)]
+                        [not(self::msub)]
+                        [not(self::msubsup)]
+                        [not(self::mfrac)]
+                        [not(self::mroot)]
+                        [not(self::mmultiscripts)]" mode="mml2tex-grouping">
     <xsl:copy>
       <xsl:apply-templates select="@*" mode="#current"/>
       
       <xsl:for-each-group select="*" 
-        group-adjacent="concat(
-                               name(), 
+        group-adjacent="concat(name(), 
                                string-join(for $i in @* except @xml:space return concat($i/local-name(), $i), '-'),
-                               matches(., concat('^([\p{L}', $whitespace-regex, '])$'))
-                              )">
+                               matches(., concat('^[\p{L}\p{P}', $whitespace-regex, ']+$'), 'i')
+                               )">
           <xsl:choose>
-            <!-- some MathML elements expect a certain order of arguments -->
-            <xsl:when test="(current-group()/self::mtext or current-group()/self::mi[@mathvariant])  
-                            and not(parent::msup or parent::msub or parent::msubsup or parent::mfrac or parent::mroot or parent::mmultiscripts)">
+            <xsl:when test="(current-group()/self::mtext or current-group()/self::mi[@mathvariant])">
               <xsl:copy>
                 <xsl:apply-templates select="current-group()/@*, current-group()/node()" mode="#current"/>
-                </xsl:copy>
+              </xsl:copy>
             </xsl:when>
             <xsl:otherwise>
               <xsl:apply-templates select="current-group()" mode="#current"/>
