@@ -16,6 +16,7 @@
   <xsl:import href="function-names.xsl"/>
   
   <xsl:variable name="whitespace-regex" select="'\s&#x2000;-&#x200b;'" as="xs:string"/>
+  <xsl:variable name="wrapper-element-names" select="('msup', 'msub', 'msubsup', 'mfrac', 'mroot', 'mmultiscripts')" as="xs:string+"/>
   
   <xsl:template match="mml:math[every $i in .//mml:* 
                                 satisfies (string-length(normalize-space($i)) eq 0 and not($i/@*))]
@@ -29,12 +30,7 @@
         * -->
   
   <xsl:template match="*[count(mi) gt 1 or count(mtext) gt 1]
-                        [not(self::msup)]
-                        [not(self::msub)]
-                        [not(self::msubsup)]
-                        [not(self::mfrac)]
-                        [not(self::mroot)]
-                        [not(self::mmultiscripts)]" mode="mml2tex-grouping">
+                        [not(local-name() = $wrapper-element-names)]" mode="mml2tex-grouping">
     <xsl:copy>
       <xsl:apply-templates select="@*" mode="#current"/>
       
@@ -180,7 +176,7 @@
     </xsl:element>
   </xsl:template>
   
-  <xsl:template match="mtext[matches(., '^\s*[0-9]+\s*$')]" mode="mml2tex-preprocess" priority="10">
+  <xsl:template match="mtext[matches(., '^\s*[0-9]+\s*$')]" mode="mml2tex-preprocess">
     <xsl:element name="{mml:gen-name(parent::*, 'mn')}">
       <xsl:apply-templates select="@*" mode="#current"/>
       <xsl:value-of select="normalize-space(.)"/>
@@ -190,8 +186,9 @@
   <xsl:variable name="non-whitespace-element-names" select="('mn', 'mo')" as="xs:string+"/>
   
   <xsl:template match="mtext[matches(., concat('^[', $whitespace-regex, ']+$'))]
-                            [preceding::node()[1]/ancestor-or-self::*[local-name() = $non-whitespace-element-names] or
-                             following::node()[1]/self::*[local-name() = $non-whitespace-element-names]]" mode="mml2tex-preprocess"/>
+                            [not(parent::*/local-name() = $wrapper-element-names)]
+                            [preceding::node()[1]/ancestor-or-self::*[local-name() = ($non-whitespace-element-names, $non-text-element-names)] or
+                             following::node()[1]/self::*[local-name() = ($non-whitespace-element-names, $non-text-element-names)]]" mode="mml2tex-preprocess"/>
   
   <xsl:template match="mtext[matches(., concat('^\s*', $mml2tex:operators-regex, '\s*$'))][not(matches(., concat('^[', $whitespace-regex, ']+$')))]" mode="mml2tex-preprocess">
     <xsl:element name="{mml:gen-name(parent::*, 'mo')}">
@@ -200,9 +197,17 @@
     </xsl:element>
   </xsl:template>
   
+  <!-- regroup msubsups with empty argument -->
+  
+  <xsl:template match="*[following-sibling::*[1][local-name() eq 'msubsup'][*[1][matches(., concat('[', $whitespace-regex, ']'))]]]" mode="mml2tex-preprocess"/>
+  
+  <xsl:template match="msubsup/*[matches(., concat('[', $whitespace-regex, ']'))]" mode="mml2tex-preprocess">
+    <xsl:copy-of select="parent::*/preceding-sibling::*[1]"/>
+  </xsl:template>
+  
   <!-- to-do group mtext in 1st mode and text heurstics in another mode or try matching to mtext/text() -->
   
-  <xsl:template match="mtext[not(matches(., concat('^[', $whitespace-regex, ']+$')))]" mode="mml2tex-preprocess">
+  <xsl:template match="mtext[not(matches(., concat('^[', $whitespace-regex, ']+$')))]" mode="mml2tex-preprocess" priority="-1">
     <xsl:variable name="new-mathml" as="element()+">
       <xsl:variable name="parent" select="parent::*" as="element()"/>
       <xsl:variable name="regular-words-regex" select="'(\p{L}\p{L}+)([-\s]\p{L}\p{L}+)+\s*'" as="xs:string"/>
