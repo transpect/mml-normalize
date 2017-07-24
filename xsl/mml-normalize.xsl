@@ -15,7 +15,7 @@
   <xsl:import href="operators.xsl"/>
   <xsl:import href="function-names.xsl"/>
   
-  <xsl:variable name="whitespace-regex" select="'\s&#x2000;-&#x200b;'" as="xs:string"/>
+  <xsl:variable name="whitespace-regex" select="'\p{Zs}'" as="xs:string"/>
   <xsl:variable name="wrapper-element-names" select="('msup', 'msub', 'msubsup', 'mfrac', 'mroot', 'mmultiscripts')" as="xs:string+"/>
   
   <xsl:template match="mml:math[every $i in .//mml:* 
@@ -82,13 +82,13 @@
   
   <!-- resolve msubsup if superscript and subscript is empty -->
   
-  <xsl:template match="msubsup[every $i in (*[2], *[3]) satisfies matches($i,'^[&#x2001;-&#x200b;]+$') or not(exists($i/node()))]" priority="10" mode="mml2tex-preprocess">
+  <xsl:template match="msubsup[every $i in (*[2], *[3]) satisfies matches($i, concat('^[', $whitespace-regex, ']+$')) or not(exists($i/node()))]" priority="10" mode="mml2tex-preprocess">
     <xsl:apply-templates select="*[1]" mode="#current"/>
   </xsl:template>
   
   <!-- convert msubsup to msub if superscript is empty -->
   
-  <xsl:template match="msubsup[exists(*[2]/node()) and (matches(*[3],'^[&#x2001;-&#x200b;]+$') or not(exists(*[3]/node())))]" mode="mml2tex-preprocess">
+  <xsl:template match="msubsup[exists(*[2]/node()) and (matches(*[3], concat('^[', $whitespace-regex, ']+$')) or not(exists(*[3]/node())))]" mode="mml2tex-preprocess">
     <msub xmlns="http://www.w3.org/1998/Math/MathML">
       <xsl:apply-templates select="@*, node() except *[3]" mode="#current"/>
     </msub>
@@ -96,16 +96,16 @@
   
   <!-- convert msubsup to msup if subscript is empty -->
   
-  <xsl:template match="msubsup[exists(*[3]/node()) and (matches(*[2],'^[&#x2001;-&#x200b;]+$') or not(exists(*[2]/node())))]" mode="mml2tex-preprocess">
+  <xsl:template match="msubsup[exists(*[3]/node()) and (matches(*[2], concat('^[', $whitespace-regex, ']+$')) or not(exists(*[2]/node())))]" mode="mml2tex-preprocess">
     <msup xmlns="http://www.w3.org/1998/Math/MathML">
       <xsl:apply-templates select="@*, node() except *[2]" mode="#current"/>
     </msup>
   </xsl:template>
   
-  <!-- resolve msub/msup with empty argument -->
+  <!-- resolve msub/msup with empty exponent -->
   
-  <xsl:template match="msub[matches(*[2],'^[&#x2001;-&#x200b;]+$') or not(exists(*[2]/node()))]
-                       |msup[matches(*[2],'^[&#x2001;-&#x200b;]+$') or not(exists(*[2]/node()))]" mode="mml2tex-preprocess">
+  <xsl:template match="msub[matches(*[2], concat('^[', $whitespace-regex, ']+$')) or not(exists(*[2]/node()))]
+                      |msup[matches(*[2], concat('^[', $whitespace-regex, ']+$')) or not(exists(*[2]/node()))]" mode="mml2tex-preprocess">
     <xsl:apply-templates select="*[1]" mode="#current"/>
   </xsl:template>
   
