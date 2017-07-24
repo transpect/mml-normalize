@@ -93,10 +93,24 @@
       <xsl:apply-templates select="@*, node() except *[3]" mode="#current"/>
     </msub>
   </xsl:template>
+
+  <!-- regroup msubsups with empty argument -->
   
+  <xsl:template match="*[following-sibling::*[1][local-name() eq 'msubsup' 
+                                                 and *[1][matches(., concat('[', $whitespace-regex, ']'))]
+                                                 and not(*[2][matches(., concat('[', $whitespace-regex, ']'))])
+                                                 and not(*[3][matches(., concat('[', $whitespace-regex, ']'))])
+                                                 ]]" mode="mml2tex-preprocess"/>
+  
+  <xsl:template match="msubsup/*[1][matches(., concat('[', $whitespace-regex, ']'))]" mode="mml2tex-preprocess">
+    <xsl:copy-of select="parent::*/preceding-sibling::*[1]"/>
+  </xsl:template>
+
   <!-- convert msubsup to msup if subscript is empty -->
   
-  <xsl:template match="msubsup[exists(*[3]/node()) and (matches(*[2], concat('^[', $whitespace-regex, ']+$')) or not(exists(*[2]/node())))]" mode="mml2tex-preprocess">
+  <xsl:template match="msubsup[exists(*[3]/node()) 
+                               and (matches(*[2], concat('^[', $whitespace-regex, ']+$')) 
+                                    or not(exists(*[2]/node())))]" mode="mml2tex-preprocess">
     <msup xmlns="http://www.w3.org/1998/Math/MathML">
       <xsl:apply-templates select="@*, node() except *[2]" mode="#current"/>
     </msup>
@@ -116,7 +130,7 @@
   <!-- repair msup/msub with more than two child elements. We assume the last node was superscripted/subscripted -->
 
   <xsl:template match="msup[count(*) gt 2]
-		       |msub[count(*) gt 2]" mode="mml2tex-preprocess">
+		                  |msub[count(*) gt 2]" mode="mml2tex-preprocess">
     <xsl:copy>
       <xsl:apply-templates select="@*" mode="#current"/>
       <mrow xmlns="http://www.w3.org/1998/Math/MathML">
@@ -195,14 +209,6 @@
       <xsl:apply-templates select="@*" mode="#current"/>
       <xsl:value-of select="normalize-space(.)"/>
     </xsl:element>
-  </xsl:template>
-  
-  <!-- regroup msubsups with empty argument -->
-  
-  <xsl:template match="*[following-sibling::*[1][local-name() eq 'msubsup'][*[1][matches(., concat('[', $whitespace-regex, ']'))]]]" mode="mml2tex-preprocess"/>
-  
-  <xsl:template match="msubsup/*[matches(., concat('[', $whitespace-regex, ']'))]" mode="mml2tex-preprocess">
-    <xsl:copy-of select="parent::*/preceding-sibling::*[1]"/>
   </xsl:template>
   
   <!-- to-do group mtext in 1st mode and text heurstics in another mode or try matching to mtext/text() -->
