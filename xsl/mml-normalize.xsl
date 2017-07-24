@@ -15,7 +15,7 @@
   <xsl:import href="operators.xsl"/>
   <xsl:import href="function-names.xsl"/>
   
-  <xsl:variable name="whitespace-regex" select="'\p{Zs}'" as="xs:string"/>
+  <xsl:variable name="whitespace-regex" select="'\p{Zs}&#x200b;-&#x200f;'" as="xs:string"/>
   <xsl:variable name="wrapper-element-names" select="('msup', 'msub', 'msubsup', 'mfrac', 'mroot', 'mmultiscripts')" as="xs:string+"/>
   
   <xsl:template match="mml:math[every $i in .//mml:* 
@@ -213,7 +213,7 @@
   
   <!-- to-do group mtext in 1st mode and text heurstics in another mode or try matching to mtext/text() -->
   
-  <xsl:template match="mtext[not(matches(., concat('^[', $whitespace-regex, ']+$')))]" mode="mml2tex-preprocess" priority="-1">
+  <xsl:template match="mtext[not(matches(., concat('^[', $whitespace-regex, ']+$')))]" mode="mml2tex-preprocess" priority="10">
     <xsl:variable name="new-mathml" as="element()+">
       <xsl:variable name="parent" select="parent::*" as="element()"/>
       <xsl:variable name="regular-words-regex" select="'(\p{L}\p{L}+)([-\s]\p{L}\p{L}+)+\s*'" as="xs:string"/>
