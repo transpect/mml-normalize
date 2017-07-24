@@ -96,13 +96,13 @@
 
   <!-- regroup msubsups with empty argument -->
   
-  <xsl:template match="*[following-sibling::*[1][local-name() eq 'msubsup' 
-                                                 and *[1][matches(., concat('[', $whitespace-regex, ']'))]
-                                                 and not(*[2][matches(., concat('[', $whitespace-regex, ']'))])
-                                                 and not(*[3][matches(., concat('[', $whitespace-regex, ']'))])
-                                                 ]]" mode="mml2tex-preprocess"/>
+  <xsl:template match="*[local-name() = ('mi', 'mn', 'mtext')][following-sibling::*[1][local-name() eq 'msubsup' 
+                                                               and *[1][matches(., concat('[', $whitespace-regex, ']'))]
+                                                               and not(*[2][matches(., concat('[', $whitespace-regex, ']'))])
+                                                               and not(*[3][matches(., concat('[', $whitespace-regex, ']'))])
+                                                               ]]" mode="mml2tex-preprocess"/>
   
-  <xsl:template match="msubsup/*[1][matches(., concat('[', $whitespace-regex, ']'))]" mode="mml2tex-preprocess">
+  <xsl:template match="msubsup[preceding-sibling::*[1][local-name() = ('mi', 'mn', 'mtext')]]/*[1][matches(., concat('[', $whitespace-regex, ']'))]" mode="mml2tex-preprocess">
     <xsl:copy-of select="parent::*/preceding-sibling::*[1]"/>
   </xsl:template>
 
