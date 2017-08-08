@@ -213,7 +213,7 @@
   
   <!-- to-do group mtext in 1st mode and text heurstics in another mode or try matching to mtext/text() -->
   
-  <xsl:template match="mtext[not(matches(., concat('^[', $whitespace-regex, ']+$')))]" mode="mml2tex-preprocess" priority="10">
+  <xsl:template match="mtext[not(matches(., concat('^[', $whitespace-regex, ']+$')) or processing-instruction())]" mode="mml2tex-preprocess" priority="10">
     <xsl:variable name="new-mathml" as="element()+">
       <xsl:variable name="parent" select="parent::*" as="element()"/>
       <xsl:variable name="regular-words-regex" select="'(\p{L}\p{L}+)([-\s]\p{L}\p{L}+)+\s*'" as="xs:string"/>
