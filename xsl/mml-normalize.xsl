@@ -123,9 +123,15 @@
     <xsl:apply-templates select="*[1]" mode="#current"/>
   </xsl:template>
   
-  <!-- resolve mspace less equal than 0.25em -->
+  <!-- dissolve mspace less equal than 0.25em -->
 
-  <xsl:template match="mspace[xs:decimal(replace(@width, '[a-z]+$', '')) le 0.25][not(preceding-sibling::*[1]/self::mtext or following-sibling::*[1]/self::mtext)]" mode="mml2tex-preprocess"/>
+  <xsl:variable name="dissolve-mspace-less-than-025em" select="true()" as="xs:boolean"/>
+
+  <xsl:template match="mspace[xs:decimal(replace(@width, '[a-z]+$', '')) le 0.25][not(preceding-sibling::*[1]/self::mtext or following-sibling::*[1]/self::mtext)]" mode="mml2tex-preprocess">
+    <xsl:if test="not($dissolve-mspace-less-than-025em)">
+      <xsl:next-match/>
+    </xsl:if>
+  </xsl:template>
 
   <!-- repair msup/msub with more than two child elements. We assume the last node was superscripted/subscripted -->
 
@@ -214,9 +220,9 @@
   <!-- to-do group mtext in 1st mode and text heurstics in another mode or try matching to mtext/text() -->
   
   <xsl:template match="mtext[not(matches(., concat('^[', $whitespace-regex, ']+$')) or processing-instruction())]" mode="mml2tex-preprocess" priority="10">
+    <xsl:param name="regular-words-regex" select="'(\p{L}\p{L}+)([-\s]\p{L}\p{L}+)+\s*'" as="xs:string" tunnel="yes"/>
     <xsl:variable name="new-mathml" as="element()+">
       <xsl:variable name="parent" select="parent::*" as="element()"/>
-      <xsl:variable name="regular-words-regex" select="'(\p{L}\p{L}+)([-\s]\p{L}\p{L}+)+\s*'" as="xs:string"/>
       <xsl:analyze-string select="." regex="{$regular-words-regex}">
   
         <!-- preserve hyphenated words -->
