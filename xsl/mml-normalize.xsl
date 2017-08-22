@@ -5,7 +5,7 @@
   xmlns:mml2tex="http://transpect.io/mml2tex"
   xmlns="http://www.w3.org/1998/Math/MathML"
   version="2.0"
-  exclude-result-prefixes="mml xs" 
+  exclude-result-prefixes="#all" 
   xpath-default-namespace="http://www.w3.org/1998/Math/MathML">
   
   <!--  *
@@ -205,10 +205,12 @@
   
   <xsl:variable name="non-whitespace-element-names" select="('mn', 'mo')" as="xs:string+"/>
   
+  <xsl:variable name="punctuation-marks" select="('.', ',', ';', '․', '‥', '…')" as="xs:string+"/>
+  
   <xsl:template match="mtext[matches(., concat('^[', $whitespace-regex, ']+$'))]
                             [not(parent::*/local-name() = $wrapper-element-names)]
-                            [preceding::node()[1]/ancestor-or-self::*[local-name() = ($non-whitespace-element-names, $non-text-element-names)] or
-                             following::node()[1]/self::*[local-name() = ($non-whitespace-element-names, $non-text-element-names)]]" mode="mml2tex-preprocess"/>
+                            [preceding::*[1]/ancestor-or-self::*[local-name() = ($non-whitespace-element-names, $non-text-element-names)][not(. = $punctuation-marks)] or
+                            following::*[1]/self::*[local-name() = ($non-whitespace-element-names, $non-text-element-names)][not(. = $punctuation-marks)]]" mode="mml2tex-preprocess"/>
   
   <xsl:template match="mtext[matches(., concat('^\s*', $mml2tex:operators-regex, '\s*$'))][not(matches(., concat('^[', $whitespace-regex, ']+$')))]" mode="mml2tex-preprocess">
     <xsl:element name="{mml:gen-name(parent::*, 'mo')}">
