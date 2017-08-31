@@ -160,9 +160,25 @@
     </xsl:copy>
     <xsl:apply-templates select="mrow/*[position() gt 1]" mode="#current"/>
   </xsl:template>
+
+  <xsl:template match="*[matches(., concat('^', $mml2tex:functions-names-regex, '\d+$'))]" mode="mml2tex-preprocess">
+    <xsl:variable name="attributes" select="@*"/>
+    <xsl:analyze-string select="." regex="{$mml2tex:functions-names-regex}">
+      <xsl:matching-substring>
+        <mo>
+          <xsl:apply-templates select="$attributes"/>
+          <xsl:value-of select="."/>
+        </mo>
+      </xsl:matching-substring>
+      <xsl:non-matching-substring>
+        <mn>
+          <xsl:value-of select="."/>
+        </mn>
+      </xsl:non-matching-substring>
+    </xsl:analyze-string>
+  </xsl:template>  
   
-    <xsl:variable name="non-text-element-names" as="xs:string*"
-    select="('mfrac', 'mn', 'mo')"/>
+  <xsl:variable name="non-text-element-names" select="('mfrac', 'mn', 'mo')" as="xs:string*"/>
   
   <xsl:template match="mtext[matches(., '^[\p{Zs}&#x200b;]+$')]
                             [
