@@ -162,13 +162,13 @@
   </xsl:template>
 
   <xsl:template match="*[matches(., concat('^', $mml2tex:functions-names-regex, '\d+$'))]" mode="mml2tex-preprocess">
-    <xsl:variable name="attributes" select="@*"/>
+    <xsl:variable name="attributes" select="@*" as="attribute()*"/>
     <xsl:analyze-string select="." regex="{$mml2tex:functions-names-regex}">
       <xsl:matching-substring>
-        <mo>
+        <mi>
           <xsl:apply-templates select="$attributes"/>
           <xsl:value-of select="."/>
-        </mo>
+        </mi>
       </xsl:matching-substring>
       <xsl:non-matching-substring>
         <mn>
