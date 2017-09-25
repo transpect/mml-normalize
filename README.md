@@ -1,6 +1,6 @@
 # mathml-normalize
 
-A library to normalize MathML equations with certain heuristic methods.
+An XSLT library to normalize MathML equations with certain heuristic methods.
 
 ## Description
 
