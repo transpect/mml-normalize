@@ -4,7 +4,7 @@ An XSLT library to normalize MathML equations with heuristic methods.
 
 ## Description
 
-The authoring of math equations is an error-prone process, especially with WYSIWYG editors such as MathType and Microsoft Word Equation Editor. For example, authors tend to write symbols accidentally in text mode instead of changing the font-style to normal. This results most likely in wrong MathML markup for the symbol, like `mtext` where `mi` is actually appropriate.
+The authoring of math equations is an error-prone process, especially with WYSIWYG editors such as MathType and Microsoft Word Equation Editor. For example, authors tend to write symbols accidentally in text mode instead of changing the font-style to normal. This results most likely in wrong MathML markup for the symbol, like `mtext` where `mi` is appropriate.
 
 Consider this MathML equation with wrong markup:
 
