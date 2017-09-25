@@ -46,4 +46,4 @@ $ saxon -xsl:mml-normalize/xsl/mml-normalize.xsl -s:eq.xml -o:eq-nrmlzd.xml -im:
 ```
 ## Note
 
-In our experience of working with poorly formatted equations, this XSLT helps to improve the markup many times. However, due to the nature of heuristic methods, there can be cases where this XSLT is no help at all or changes something for the worse. We suggest to include Schematron checking and a certain level of math proofreading in your process.
+In our experience of working with poorly formatted equations, this XSLT improved the markup plenty of times. However, due to the nature of heuristic methods, there can be cases where this XSLT is no help at all or changes something for the worse. We suggest to include Schematron checking and a certain level of math proofreading in your process.
