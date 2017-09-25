@@ -249,7 +249,6 @@
           </xsl:element>
         </xsl:matching-substring>
         <xsl:non-matching-substring>
-      
           <!-- tag operators -->
           <xsl:analyze-string select="." regex="{$mml2tex:operators-regex}">
             
@@ -308,7 +307,7 @@
                             <xsl:non-matching-substring>
                               <!-- map characters to mi -->
                               <xsl:choose>
-                                <xsl:when test="string-length(normalize-space(.)) eq 1">
+                                <xsl:when test="string-length(normalize-space(.)) lt 4">
                                   <xsl:element name="{mml:gen-name($parent, 'mi')}">
                                     <xsl:attribute name="mathvariant" select="'normal'"/>
                                     <xsl:value-of select="normalize-space(.)"/>
@@ -336,7 +335,7 @@
     </xsl:variable>
     <xsl:choose>
       <xsl:when test="count($new-mathml) gt 1">
-        <mrow xmlns="http://www.w3.org/1998/Math/MathML">
+        <mrow>
           <xsl:sequence select="$new-mathml"/>
         </mrow>
       </xsl:when>
@@ -361,11 +360,5 @@
       <xsl:apply-templates select="@*|node()|processing-instruction()" mode="#current"/>
     </xsl:copy>
   </xsl:template>
-  
-  <!--<xsl:template match="/" mode="mml2tex-preprocess">
-    <xsl:copy>
-      <xsl:apply-templates mode="mml2tex-preprocess"/>
-    </xsl:copy>
-  </xsl:template>-->
   
 </xsl:stylesheet>
