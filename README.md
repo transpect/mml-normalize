@@ -8,7 +8,7 @@ The authoring of math equations is an error-prone process, especially with WYSIW
 
 Consider this MathML equation with wrong markup:
 
-```
+```xml
 <math xmlns="http://www.w3.org/1998/Math/MathML">
   <mtext>E=m</mtext>
   <msubsup>
@@ -21,7 +21,7 @@ Consider this MathML equation with wrong markup:
 
 After mml-normalize, the `mtext` was resolved and the text was properly tagged with `mi` and `mo`. Furthermore, the `msubsup` was replaced with `msup`
 
-```
+```xml
 <math xmlns="http://www.w3.org/1998/Math/MathML" xmlns:xlink="http://www.w3.org/1999/xlink">
   <mrow>
     <mi mathvariant="normal">E</mi>
