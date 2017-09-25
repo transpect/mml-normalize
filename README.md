@@ -1,6 +1,6 @@
 # mathml-normalize
 
-An XSLT library to normalize MathML equations with certain heuristic methods.
+An XSLT library to normalize MathML equations with heuristic methods.
 
 ## Description
 
@@ -19,7 +19,7 @@ Consider this MathML equation with wrong markup:
 </math>
 ```
 
-After mml-normalize, the `mtext` was resolved and the text was properly tagged with `mi` and `mo`. Furthermore, the `msubsup` was replaced with `msup`
+After mml-normalize, the `mtext` was resolved and the text was properly tagged with `mi` and `mo` elements. Furthermore, the `msubsup` was replaced with `msup`
 
 ```xml
 <math xmlns="http://www.w3.org/1998/Math/MathML" xmlns:xlink="http://www.w3.org/1999/xlink">
