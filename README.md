@@ -35,7 +35,7 @@ After mml-normalize, the `mtext` was resolved and the text was properly tagged w
 </math>
 ```
 
-## Invokation
+## Invoke with Saxon
 
 mml-normalize contains two XSLT modes. First, you should invoke `mml2tex-grouping` and afterwards `mml2tex-preprocess`.
 
