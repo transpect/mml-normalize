@@ -246,7 +246,6 @@
     <xsl:param name="regular-words-regex" select="'(\p{L}\p{L}+)([-\s]\p{L}\p{L}+)+\s*'" as="xs:string" tunnel="yes"/>
     <xsl:variable name="new-mathml" as="element()+">
       <xsl:variable name="parent" select="parent::*" as="element()"/>
-          <xsl:message select="'#################', ."/>
 
       <xsl:analyze-string select="." regex="{$regular-words-regex}">
   
