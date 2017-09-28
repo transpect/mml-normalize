@@ -95,13 +95,19 @@
 
   <!-- regroup msubsups with empty argument -->
   
-  <xsl:template match="*[local-name() = ('mi', 'mn', 'mtext')][following-sibling::*[1][local-name() eq 'msubsup' 
-                                                               and *[1][matches(., concat('[', $whitespace-regex, ']'))]
-                                                               and not(*[2][matches(., concat('[', $whitespace-regex, ']'))])
-                                                               and not(*[3][matches(., concat('[', $whitespace-regex, ']'))])
-                                                               ]]" mode="mml2tex-preprocess"/>
+  <xsl:template match="*[local-name() = ('mi', 'mn', 'mtext')]
+                        [following-sibling::*[1][self::msubsup 
+                                                 and *[1][matches(., concat('[', $whitespace-regex, ']'))]
+                                                 and not(*[2][matches(., concat('[', $whitespace-regex, ']'))])
+                                                 and not(*[3][matches(., concat('[', $whitespace-regex, ']'))])
+                                                 ]]" mode="mml2tex-preprocess"/>
   
-  <xsl:template match="msubsup[preceding-sibling::*[1][local-name() = ('mi', 'mn', 'mtext')]]/*[1][matches(., concat('[', $whitespace-regex, ']'))]" mode="mml2tex-preprocess">
+  <xsl:template match="msubsup[*[1][matches(., concat('[', $whitespace-regex, ']'))]
+                               and not(*[2][matches(., concat('[', $whitespace-regex, ']'))])
+                               and not(*[3][matches(., concat('[', $whitespace-regex, ']'))])]
+                               [preceding-sibling::*[1][local-name() = ('mi', 'mn', 'mtext')]]/*[1][matches(., concat('[', 
+                                                                                                                     $whitespace-regex, 
+                                                                                                                     ']'))]" mode="mml2tex-preprocess">
     <xsl:copy-of select="parent::*/preceding-sibling::*[1]"/>
   </xsl:template>
 
@@ -240,6 +246,8 @@
     <xsl:param name="regular-words-regex" select="'(\p{L}\p{L}+)([-\s]\p{L}\p{L}+)+\s*'" as="xs:string" tunnel="yes"/>
     <xsl:variable name="new-mathml" as="element()+">
       <xsl:variable name="parent" select="parent::*" as="element()"/>
+          <xsl:message select="'#################', ."/>
+
       <xsl:analyze-string select="." regex="{$regular-words-regex}">
   
         <!-- preserve hyphenated words -->
