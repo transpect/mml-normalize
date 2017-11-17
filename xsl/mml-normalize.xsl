@@ -34,14 +34,19 @@
       <xsl:apply-templates select="@*" mode="#current"/>
       
       <xsl:for-each-group select="*" 
-        group-adjacent="concat(name(), 
-                               string-join(for $i in @* except @xml:space return concat($i/local-name(), $i), '-'),
-                               matches(., concat('^[\p{L}\p{P}', $whitespace-regex, ']+$'), 'i')
+        group-adjacent="concat(if(self::mspace) then 'mtext' else local-name(),
+                               string-join(for $i in @* except (@xml:space|@width) return concat($i/local-name(), $i), '-'),
+                               matches(., concat('^[\p{L}\p{P}', $whitespace-regex, ']+$'), 'i') or self::mspace
                                )">
           <xsl:choose>
-            <xsl:when test="(current-group()/self::mtext or current-group()/self::mi[@mathvariant])">
+            <xsl:when test="(current-group()/self::mtext 
+                          or current-group()/self::mi[@mathvariant]
+                          or current-group()/self::mspace)">
               <xsl:copy>
-                <xsl:apply-templates select="current-group()/@*, current-group()/node()" mode="#current"/>
+                <xsl:apply-templates select="current-group()/@*[not(parent::mspace)], 
+                                             current-group()/node()|current-group()[self::mspace]" mode="#current">
+                  <xsl:with-param name="in-group" select="true()" as="xs:boolean"/>
+                </xsl:apply-templates>
               </xsl:copy>
             </xsl:when>
             <xsl:otherwise>
@@ -52,6 +57,20 @@
       </xsl:for-each-group>
       
     </xsl:copy>
+  </xsl:template>
+  
+  <xsl:template match="mspace" mode="mml2tex-grouping">
+    <xsl:param name="in-group" as="xs:boolean?"/>
+    <xsl:choose>
+      <xsl:when test="$in-group">
+        <xsl:text>&#x20;</xsl:text>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:copy>
+          <xsl:apply-templates select="@*, node()" mode="#current"/>
+        </xsl:copy>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
   
   <!-- conclude three single mo elements with the '.' character to horizontal ellipsis -->
