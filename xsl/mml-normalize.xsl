@@ -42,12 +42,12 @@
             <xsl:when test="(current-group()/self::mtext 
                           or current-group()/self::mi[@mathvariant]
                           or current-group()/self::mspace)">
-              <xsl:copy>
+              <xsl:element name="{if(current-group()/self::mspace) then 'mml:mtext' else name()}">
                 <xsl:apply-templates select="current-group()/@*[not(parent::mspace)], 
                                              current-group()/node()|current-group()[self::mspace]" mode="#current">
                   <xsl:with-param name="in-group" select="true()" as="xs:boolean"/>
                 </xsl:apply-templates>
-              </xsl:copy>
+              </xsl:element>
             </xsl:when>
             <xsl:otherwise>
               <xsl:apply-templates select="current-group()" mode="#current"/>
