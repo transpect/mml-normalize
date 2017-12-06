@@ -263,8 +263,9 @@
   
   <xsl:template match="mtext[not(matches(., concat('^[', $whitespace-regex, ']+$')) or processing-instruction())]" mode="mml2tex-preprocess" priority="10">
     <xsl:param name="regular-words-regex" select="'(\p{L}\p{L}+)([-\s]\p{L}\p{L}+)+\s*'" as="xs:string" tunnel="yes"/>
+    <xsl:variable name="current" select="." as="element(mtext)"/>
+    <xsl:variable name="parent" select="parent::*" as="element()"/>
     <xsl:variable name="new-mathml" as="element()+">
-      <xsl:variable name="parent" select="parent::*" as="element()"/>
 
       <xsl:analyze-string select="." regex="{$regular-words-regex}">
   
@@ -333,7 +334,8 @@
                             <xsl:non-matching-substring>
                               <!-- map characters to mi -->
                               <xsl:choose>
-                                <xsl:when test="string-length(normalize-space(.)) lt 4">
+                                <xsl:when test="string-length(normalize-space(.)) lt 4
+                                                and not($current/@xml:space eq 'preserve')">
                                   <xsl:element name="{mml:gen-name($parent, 'mi')}">
                                     <xsl:attribute name="mathvariant" select="'normal'"/>
                                     <xsl:value-of select="normalize-space(.)"/>
