@@ -14,7 +14,9 @@
   
   <xsl:import href="operators.xsl"/>
   <xsl:import href="function-names.xsl"/>
-  
+
+  <xsl:param name="dissolve-mspace-less-than-025em" select="true()" as="xs:boolean"/>
+
   <xsl:variable name="whitespace-regex" select="'\p{Zs}&#x200b;-&#x200f;'" as="xs:string"/>
   <xsl:variable name="wrapper-element-names" select="('msup', 'msub', 'msubsup', 'mfrac', 'mroot', 'mmultiscripts')" as="xs:string+"/>
   
@@ -182,8 +184,6 @@
   </xsl:template>
   
   <!-- dissolve mspace less equal than 0.25em -->
-
-  <xsl:variable name="dissolve-mspace-less-than-025em" select="true()" as="xs:boolean"/>
 
   <xsl:template match="mspace[xs:decimal(replace(@width, '[a-z]+$', '')) le 0.25][not(preceding-sibling::*[1]/self::mtext or following-sibling::*[1]/self::mtext)]" mode="mml2tex-preprocess">
     <xsl:if test="not($dissolve-mspace-less-than-025em)">
