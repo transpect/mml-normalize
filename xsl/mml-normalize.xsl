@@ -73,6 +73,40 @@
     </xsl:choose>
   </xsl:template>
   
+  <xsl:template
+    match="*[local-name() = ('msub', 'msup')][empty((*[1]/@*, *[1]/node()))][following-sibling::*[1][local-name() = current()/local-name()]][empty((*[1]/@*, *[1]/node()))]"
+    mode="mml2tex-grouping">
+    <xsl:variable name="localname" select="local-name()"/>
+    <xsl:variable name="next-non-group-el" select="following-sibling::*[not(local-name() = $localname)][1]/generate-id()"/>
+    <xsl:copy>
+      <xsl:apply-templates select="*[1]" mode="#current"/>
+      <xsl:variable name="mrow">
+        <mrow>
+          <xsl:apply-templates
+            select="*[2], following-sibling::*[following-sibling::*/generate-id() = $next-non-group-el]/*[2]"
+            mode="#current">
+            <xsl:with-param name="dissolve-mrow" select="true()"/>
+          </xsl:apply-templates>
+        </mrow>
+      </xsl:variable>
+      <xsl:apply-templates select="$mrow" mode="#current"/>
+    </xsl:copy>
+  </xsl:template>
+    
+  <xsl:template match="mrow" mode="mml2tex-grouping">
+    <xsl:param name="dissolve-mrow" select="false()"/>
+    <xsl:choose>
+      <xsl:when test="$dissolve-mrow">
+        <xsl:apply-templates mode="#current"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:next-match/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+    
+  <xsl:template match="*[local-name() = ('msub', 'msup')][empty((*[1]/@*, *[1]/node()))][preceding-sibling::*[1][local-name() = current()/local-name()]][empty((*[1]/@*, *[1]/node()))]" mode="mml2tex-grouping" priority="2"/>
+  
   <!-- conclude three single mo elements with the '.' character to horizontal ellipsis -->
   <xsl:template match="mo[. = '.']
                          [preceding-sibling::*[1]/self::mo[. = '.'][not(preceding-sibling::*[1]/self::mo[. = '.'])]]
