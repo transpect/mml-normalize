@@ -225,7 +225,8 @@
     <xsl:apply-templates select="mrow/*[position() gt 1]" mode="#current"/>
   </xsl:template>
 
-  <xsl:template match="*[matches(., concat('^', $mml2tex:functions-names-regex, '\d+$'))]" mode="mml2tex-preprocess">
+  <xsl:template match="*[local-name() = ('mo', 'mi', 'mtext', 'mn')]
+                        [matches(., concat('^', $mml2tex:functions-names-regex, '\d+$'))]" mode="mml2tex-preprocess">
     <xsl:variable name="attributes" select="@*" as="attribute()*"/>
     <xsl:analyze-string select="." regex="{$mml2tex:functions-names-regex}">
       <xsl:matching-substring>
