@@ -150,7 +150,7 @@
   
   <!-- resolve munder if underscript is empty -->
   
-  <xsl:template match="munder[matches(*[2], concat('^[', $whitespace-regex, ']+$'))]" mode="mml2tex-preprocess">
+  <xsl:template match="*[local-name() = ('mover', 'munder')][matches(*[2], concat('^[', $whitespace-regex, ']+$'))]" mode="mml2tex-preprocess">
     <xsl:apply-templates select="*[1]" mode="#current"/>
   </xsl:template>
 
