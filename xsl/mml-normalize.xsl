@@ -147,6 +147,12 @@
       <xsl:apply-templates select="@*, node() except *[3]" mode="#current"/>
     </msub>
   </xsl:template>
+  
+  <!-- resolve munder if underscript is empty -->
+  
+  <xsl:template match="munder[matches(*[2], concat('^[', $whitespace-regex, ']+$'))]" mode="mml2tex-preprocess">
+    <xsl:apply-templates select="*[1]" mode="#current"/>
+  </xsl:template>
 
   <!-- regroup msubsups with empty argument -->
   
