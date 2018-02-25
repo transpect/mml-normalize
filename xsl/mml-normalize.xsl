@@ -291,7 +291,11 @@
   <xsl:template match="mtext[matches(., concat('^[', $whitespace-regex, ']+$'))]
                             [not(parent::*/local-name() = $wrapper-element-names)]
                             [preceding::*[1]/ancestor-or-self::*[local-name() = ($non-whitespace-element-names, $non-text-element-names)][not(. = $punctuation-marks)] or
-                            following::*[1]/self::*[local-name() = ($non-whitespace-element-names, $non-text-element-names)][not(. = $punctuation-marks)]]" mode="mml2tex-preprocess"/>
+                            following::*[1]/self::*[local-name() = ($non-whitespace-element-names, $non-text-element-names)][not(. = $punctuation-marks)]]" 
+                mode="mml2tex-preprocess" priority="1">
+    <!-- Assigned priority to this template because it conflicted with the template in line 248 (as at this commit).
+      It shouldn’t matter because they have the same effect. Only to avoid the warning. -->
+  </xsl:template>
   
   <xsl:template match="mtext[matches(., concat('^\s*', $mml2tex:operators-regex, '\s*$'))][not(matches(., concat('^[', $whitespace-regex, ']+$')))]" mode="mml2tex-preprocess">
     <xsl:element name="{mml:gen-name(parent::*, 'mo')}">
