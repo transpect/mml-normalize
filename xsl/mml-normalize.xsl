@@ -142,7 +142,10 @@
   
   <!-- convert msubsup to msub if superscript is empty -->
   
-  <xsl:template match="msubsup[exists(*[2]/node()) and (matches(*[3], concat('^[', $whitespace-regex, ']+$')) or not(exists(*[3]/node())))]" mode="mml2tex-preprocess">
+  <xsl:template match="msubsup[exists(*[2]/node()) 
+                               and (*[3]/self::mspace
+                                    or matches(*[3], concat('^[', $whitespace-regex, ']+$')) 
+                                    or not(exists(*[3]/node())))]" mode="mml2tex-preprocess">
     <msub xmlns="http://www.w3.org/1998/Math/MathML">
       <xsl:apply-templates select="@*, node() except *[3]" mode="#current"/>
     </msub>
@@ -150,7 +153,9 @@
   
   <!-- resolve munder if underscript is empty -->
   
-  <xsl:template match="*[local-name() = ('mover', 'munder')][matches(*[2], concat('^[', $whitespace-regex, ']+$'))]" mode="mml2tex-preprocess">
+  <xsl:template match="*[local-name() = ('mover', 'munder')]
+                        [*[2]/self::mspace 
+                        or matches(*[2], concat('^[', $whitespace-regex, ']+$'))]" mode="mml2tex-preprocess">
     <xsl:apply-templates select="*[1]" mode="#current"/>
   </xsl:template>
 
@@ -175,7 +180,8 @@
   <!-- convert msubsup to msup if subscript is empty -->
   
   <xsl:template match="msubsup[exists(*[3]/node()) 
-                               and (matches(*[2], concat('^[', $whitespace-regex, ']+$')) 
+                               and (*[2]/self::mspace
+                                    or matches(*[2], concat('^[', $whitespace-regex, ']+$')) 
                                     or not(exists(*[2]/node())))]" mode="mml2tex-preprocess">
     <msup xmlns="http://www.w3.org/1998/Math/MathML">
       <xsl:apply-templates select="@*, node() except *[2]" mode="#current"/>
@@ -184,16 +190,20 @@
   
   <!-- resolve msub/msup with empty exponent -->
   
-  <xsl:template match="msub[matches(*[2], concat('^[', $whitespace-regex, ']+$')) or not(exists(*[2]/node()))]
-                      |msup[matches(*[2], concat('^[', $whitespace-regex, ']+$')) or not(exists(*[2]/node()))]" mode="mml2tex-preprocess">
+  <xsl:template match="*[local-name() = 'msub', 'msup']
+                        [*[2]/self::mspace 
+                         or matches(*[2], concat('^[', $whitespace-regex, ']+$')) 
+                         or not(exists(*[2]/node()))]" mode="mml2tex-preprocess">
     <xsl:apply-templates select="*[1]" mode="#current"/>
   </xsl:template>
   
   <!-- dissolve mspace less equal than 0.25em -->
 
-  <xsl:template match="mspace[xs:decimal(replace(@width, '[a-z]+$', '')) le 0.25][not(preceding-sibling::*[1]/self::mtext or following-sibling::*[1]/self::mtext)]" mode="mml2tex-preprocess">
-    <xsl:if test="not($dissolve-mspace-less-than-025em)">
-      <xsl:next-match/>
+  <xsl:template match="mspace[$dissolve-mspace-less-than-025em]
+                             [xs:decimal(replace(@width, '[a-z]+$', '')) le 0.25]
+                             [not(preceding-sibling::*[1]/self::mtext or following-sibling::*[1]/self::mtext)]" mode="mml2tex-preprocess">
+    <xsl:if test="parent::*/local-name() = ('mover', 'munder', 'munderover', 'msup', 'msub', 'msubsup', 'mroot', 'mfrac', 'mmultiscripts')">
+      <mrow xmlns="http://www.w3.org/1998/Math/MathML"/>
     </xsl:if>
   </xsl:template>
 
