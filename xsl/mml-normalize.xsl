@@ -196,16 +196,22 @@
                          or not(exists(*[2]/node()))]" mode="mml2tex-preprocess">
     <xsl:apply-templates select="*[1]" mode="#current"/>
   </xsl:template>
+
+  <!-- resolve empty msub/msup -->
+  
+  <xsl:template match="*[local-name() = 'msub', 'msup']
+                        [every $i in *
+                         satisfies $i/self::mspace 
+                                   or matches($i, concat('^[', $whitespace-regex, ']+$')) 
+                                   or not(exists($i/node()))]" mode="mml2tex-preprocess">
+    <xsl:apply-templates select="*[1]" mode="#current"/>
+  </xsl:template>  
   
   <!-- dissolve mspace less equal than 0.25em -->
 
   <xsl:template match="mspace[$dissolve-mspace-less-than-025em]
                              [xs:decimal(replace(@width, '[a-z]+$', '')) le 0.25]
-                             [not(preceding-sibling::*[1]/self::mtext or following-sibling::*[1]/self::mtext)]" mode="mml2tex-preprocess">
-    <xsl:if test="parent::*/local-name() = ('mover', 'munder', 'munderover', 'msup', 'msub', 'msubsup', 'mroot', 'mfrac', 'mmultiscripts')">
-      <mrow xmlns="http://www.w3.org/1998/Math/MathML"/>
-    </xsl:if>
-  </xsl:template>
+                             [not(preceding-sibling::*[1]/self::mtext or following-sibling::*[1]/self::mtext)]" mode="mml2tex-preprocess"/>
 
   <!-- repair msup/msub with more than two child elements. We assume the last node was superscripted/subscripted -->
 
