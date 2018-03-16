@@ -117,6 +117,7 @@
       <xsl:value-of select="'&#x2026;'"/>
     </mo>
   </xsl:template>
+  
   <xsl:template match="  mo[. = '.']
                            [not(following-sibling::*[1]/self::mo[. = '.'])]
                            [preceding-sibling::*[1]/self::mo[. = '.']]
@@ -190,28 +191,19 @@
   
   <!-- resolve msub/msup with empty exponent -->
   
-  <xsl:template match="*[local-name() = 'msub', 'msup']
+  <xsl:template match="*[local-name() = ('msub', 'msup')]
                         [*[2]/self::mspace 
                          or matches(*[2], concat('^[', $whitespace-regex, ']+$')) 
                          or not(exists(*[2]/node()))]" mode="mml2tex-preprocess">
     <xsl:apply-templates select="*[1]" mode="#current"/>
   </xsl:template>
-
-  <!-- resolve empty msub/msup -->
-  
-  <xsl:template match="*[local-name() = 'msub', 'msup']
-                        [every $i in *
-                         satisfies $i/self::mspace 
-                                   or matches($i, concat('^[', $whitespace-regex, ']+$')) 
-                                   or not(exists($i/node()))]" mode="mml2tex-preprocess">
-    <xsl:apply-templates select="*[1]" mode="#current"/>
-  </xsl:template>  
   
   <!-- dissolve mspace less equal than 0.25em -->
 
   <xsl:template match="mspace[$dissolve-mspace-less-than-025em]
                              [xs:decimal(replace(@width, '[a-z]+$', '')) le 0.25]
-                             [not(preceding-sibling::*[1]/self::mtext or following-sibling::*[1]/self::mtext)]" mode="mml2tex-preprocess"/>
+                             [not(preceding-sibling::*[1]/self::mtext or following-sibling::*[1]/self::mtext)]" mode="mml2tex-preprocess">
+  </xsl:template>
 
   <!-- repair msup/msub with more than two child elements. We assume the last node was superscripted/subscripted -->
 
