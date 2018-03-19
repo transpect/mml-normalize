@@ -19,6 +19,8 @@
 
   <xsl:variable name="whitespace-regex" select="'\p{Zs}&#x200b;-&#x200f;'" as="xs:string"/>
   <xsl:variable name="wrapper-element-names" select="('msup', 'msub', 'msubsup', 'mfrac', 'mroot', 'mmultiscripts')" as="xs:string+"/>
+  <xsl:variable name="sil-units-regex" select="'(m|g|s|A|K|mol|cd|rad|sr|GHz|Hz|N|Nm|Pa|J|W|C|V|F|Ω|S|Wb|T|H|°|°C|lm|lx|Bq|Gy|Sv|kat)'" as="xs:string+"/>
+  <xsl:variable name="sil-unit-prefixes-regex" select="'(G|M|k|d|c|m|µ|n|p|f)'" as="xs:string+"/>
   
   <xsl:template match="mml:math[every $i in .//mml:* 
                                 satisfies (string-length(normalize-space($i)) eq 0 and not($i/@*))]
@@ -199,10 +201,23 @@
   </xsl:template>
   
   <!-- dissolve mspace less equal than 0.25em -->
-
+  
   <xsl:template match="mspace[$dissolve-mspace-less-than-025em]
                              [xs:decimal(replace(@width, '[a-z]+$', '')) le 0.25]
-                             [not(preceding-sibling::*[1]/self::mtext or following-sibling::*[1]/self::mtext)]" mode="mml2tex-preprocess">
+                             [not(preceding-sibling::*[1]/self::mtext or following-sibling::*[1]/self::mtext)]" mode="mml2tex-preprocess"/>
+  
+  <!-- render thinspace between numbers and units -->
+  
+  <xsl:template match="mspace[xs:decimal(replace(@width, '[a-z]+$', '')) le 0.25]
+                             [matches(normalize-space(string-join(preceding-sibling::*[1]//text(), '')), '\d$')
+                              and matches(normalize-space(string-join(following-sibling::*[1], '')), concat('^', $sil-unit-prefixes-regex, '?', $sil-units-regex))]" mode="mml2tex-preprocess" priority="2">
+    <mspace width="0.16em"/>
+  </xsl:template>
+  
+  <xsl:template match="*[local-name() = ('mi', 'mtext')][. eq ' ']
+                        [matches(normalize-space(string-join(preceding-sibling::*[1]//text(), '')), '\d$')
+                         and matches(normalize-space(string-join(following-sibling::*[1], '')), concat('^', $sil-unit-prefixes-regex, '?', $sil-units-regex))]" mode="mml2tex-preprocess" priority="2">
+    <mspace width="0.16em"/>
   </xsl:template>
 
   <!-- repair msup/msub with more than two child elements. We assume the last node was superscripted/subscripted -->
