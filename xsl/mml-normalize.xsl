@@ -7,7 +7,6 @@
   version="2.0"
   exclude-result-prefixes="#all" 
   xpath-default-namespace="http://www.w3.org/1998/Math/MathML">
-  
   <!--  *
         * remove empty equation objects
         * -->
@@ -333,6 +332,7 @@
     <xsl:param name="regular-words-regex" select="'(\p{L}\p{L}+)([-\s]\p{L}\p{L}+)+\s*'" as="xs:string" tunnel="yes"/>
     <xsl:variable name="current" select="." as="element(mtext)"/>
     <xsl:variable name="parent" select="parent::*" as="element()"/>
+    <xsl:variable name="mathvariant" select="(@mathvariant, 'normal')[1]" as="xs:string"/>
     <xsl:variable name="new-mathml" as="element()+">
 
       <xsl:analyze-string select="." regex="{$regular-words-regex}">
@@ -359,7 +359,7 @@
                 <!-- tag identifiers -->
                 <xsl:matching-substring>
                   <xsl:element name="{mml:gen-name($parent, 'mi')}">
-                    <xsl:attribute name="mathvariant" select="'normal'"/>
+                    <xsl:attribute name="mathvariant" select="$mathvariant"/>
                     <xsl:value-of select="normalize-space(.)"/>
                   </xsl:element>
                 </xsl:matching-substring>
@@ -380,7 +380,7 @@
                         
                         <xsl:matching-substring>
                           <xsl:element name="{mml:gen-name($parent, 'mi')}">
-                            <xsl:attribute name="mathvariant" select="'normal'"/>
+                            <xsl:attribute name="mathvariant" select="$mathvariant"/>
                             <xsl:value-of select="regex-group(1)"/>
                           </xsl:element>
                           <xsl:element name="{mml:gen-name($parent, 'mo')}">
@@ -395,7 +395,7 @@
                             
                             <xsl:matching-substring>
                               <xsl:element name="{mml:gen-name($parent, 'mi')}">
-                                <xsl:attribute name="mathvariant" select="'normal'"/>
+                                <xsl:attribute name="mathvariant" select="$mathvariant"/>
                                 <xsl:value-of select="normalize-space(.)"/>
                               </xsl:element>
                             </xsl:matching-substring>
@@ -405,7 +405,7 @@
                                 <xsl:when test="string-length(normalize-space(.)) lt 4
                                                 and not($current/@xml:space eq 'preserve')">
                                   <xsl:element name="{mml:gen-name($parent, 'mi')}">
-                                    <xsl:attribute name="mathvariant" select="'normal'"/>
+                                    <xsl:attribute name="mathvariant" select="$mathvariant"/>
                                     <xsl:value-of select="normalize-space(.)"/>
                                   </xsl:element>
                                 </xsl:when>
