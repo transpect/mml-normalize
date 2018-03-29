@@ -37,7 +37,7 @@
       <xsl:apply-templates select="@*" mode="#current"/>
       
       <xsl:for-each-group select="*" 
-        group-adjacent="concat(if(self::mspace) then 'mtext' else local-name(),
+        group-adjacent="concat(local-name(),
                                string-join(for $i in @* except (@xml:space|@width) return concat($i/local-name(), $i), '-'),
                                matches(., concat('^[\p{L}\p{P}', $whitespace-regex, ']+$'), 'i') or self::mspace
                                )">
@@ -45,11 +45,14 @@
             <xsl:when test="(current-group()/self::mtext 
                           or current-group()/self::mi[@mathvariant]
                           or current-group()/self::mspace)">
-              <xsl:element name="{if(current-group()/self::mspace) then 'mml:mtext' else name()}">
-                <xsl:apply-templates select="current-group()/@*[not(parent::mspace)], 
-                                             current-group()/node()|current-group()[self::mspace]" mode="#current">
-                  <xsl:with-param name="in-group" select="true()" as="xs:boolean"/>
-                </xsl:apply-templates>
+              <xsl:element name="{name()}">
+                <xsl:apply-templates select="current-group()/@*[not(local-name() eq 'width')]" mode="#current"/>
+                <xsl:if test="current-group()/@width">
+                  <xsl:variable name="total-width" select="sum(for $i in current-group()/@width 
+                                                               return xs:decimal(replace($i, 'em$', '')))" as="xs:decimal"/>
+                  <xsl:attribute name="width" select="concat(xs:string($total-width), 'em')"/>
+                </xsl:if>
+                <xsl:apply-templates select="current-group()/node()" mode="#current"/>
               </xsl:element>
             </xsl:when>
             <xsl:otherwise>
@@ -60,20 +63,6 @@
       </xsl:for-each-group>
       
     </xsl:copy>
-  </xsl:template>
-  
-  <xsl:template match="mspace" mode="mml2tex-grouping">
-    <xsl:param name="in-group" as="xs:boolean?"/>
-    <xsl:choose>
-      <xsl:when test="$in-group">
-        <xsl:text>&#x20;</xsl:text>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:copy>
-          <xsl:apply-templates select="@*, node()" mode="#current"/>
-        </xsl:copy>
-      </xsl:otherwise>
-    </xsl:choose>
   </xsl:template>
   
   <xsl:template
@@ -202,12 +191,12 @@
   <!-- dissolve mspace less equal than 0.25em -->
   
   <xsl:template match="mspace[$dissolve-mspace-less-than-025em]
-                             [xs:decimal(replace(@width, '[a-z]+$', '')) le 0.25]
+                             [xs:decimal(replace(@width, 'em$', '')) le 0.25]
                              [not(preceding-sibling::*[1]/self::mtext or following-sibling::*[1]/self::mtext)]" mode="mml2tex-preprocess"/>
   
   <!-- render thinspace between numbers and units -->
   
-  <xsl:template match="mspace[xs:decimal(replace(@width, '[a-z]+$', '')) le 0.25]
+  <xsl:template match="mspace[xs:decimal(replace(@width, 'em$', '')) le 0.25]
                              [matches(normalize-space(string-join(preceding-sibling::*[1]//text(), '')), '\d$')
                               and matches(normalize-space(string-join(following-sibling::*[1], '')), concat('^', $sil-unit-prefixes-regex, '?', $sil-units-regex))]" mode="mml2tex-preprocess" priority="2">
     <mspace width="0.16em"/>
