@@ -237,7 +237,7 @@
   </xsl:template>
 
   <xsl:template match="*[local-name() = ('mo', 'mi', 'mtext', 'mn')]
-                        [matches(., concat('^', $mml2tex:functions-names-regex, '\d+$'))]" mode="mml2tex-preprocess">
+                        [matches(., concat('^', $mml2tex:functions-names-regex, '\d+([,\.]\d+)*$'))]" mode="mml2tex-preprocess">
     <xsl:choose>
       <xsl:when test="parent::*/local-name() = $wrapper-element-names">
         <mrow>
