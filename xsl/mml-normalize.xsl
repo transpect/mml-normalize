@@ -238,8 +238,22 @@
 
   <xsl:template match="*[local-name() = ('mo', 'mi', 'mtext', 'mn')]
                         [matches(., concat('^', $mml2tex:functions-names-regex, '\d+$'))]" mode="mml2tex-preprocess">
-    <xsl:variable name="attributes" select="@*" as="attribute()*"/>
-    <xsl:analyze-string select="." regex="{$mml2tex:functions-names-regex}">
+    <xsl:choose>
+      <xsl:when test="parent::*/local-name() = $wrapper-element-names">
+        <mrow>
+          <xsl:apply-templates select="mml:separate-function-names(.)" mode="#current"/>
+        </mrow>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:apply-templates select="mml:separate-function-names(.)" mode="#current"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:function name="mml:separate-function-names" as="element()+">
+    <xsl:param name="mml-element" as="element()"/>
+    <xsl:variable name="attributes" select="$mml-element/@*" as="attribute()*"/>
+    <xsl:analyze-string select="$mml-element" regex="{$mml2tex:functions-names-regex}">
       <xsl:matching-substring>
         <mi>
           <xsl:apply-templates select="$attributes"/>
@@ -252,7 +266,7 @@
         </mn>
       </xsl:non-matching-substring>
     </xsl:analyze-string>
-  </xsl:template>  
+  </xsl:function>
   
   <xsl:variable name="non-text-element-names" select="('mfrac', 'mn', 'mo')" as="xs:string*"/>
   
