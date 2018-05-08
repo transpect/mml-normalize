@@ -336,6 +336,7 @@
     <xsl:variable name="current" select="." as="element(mtext)"/>
     <xsl:variable name="parent" select="parent::*" as="element()"/>
     <xsl:variable name="mathvariant" select="(@mathvariant, 'normal')[1]" as="xs:string"/>
+    <xsl:variable name="mathcolor" select="@mathcolor"/>
     <xsl:variable name="new-mathml" as="element()+">
 
       <xsl:analyze-string select="." regex="{$regular-words-regex}">
@@ -343,6 +344,9 @@
         <!-- preserve hyphenated words -->
         <xsl:matching-substring>
           <xsl:element name="{mml:gen-name($parent, 'mtext')}">
+            <xsl:if test="$mathcolor!=''">
+              <xsl:attribute name="mathcolor" select="$mathcolor"/>
+            </xsl:if>
             <xsl:value-of select="."/>
           </xsl:element>
         </xsl:matching-substring>
@@ -352,6 +356,9 @@
             
             <xsl:matching-substring>
               <xsl:element name="{mml:gen-name($parent, 'mo')}">
+                <xsl:if test="$mathcolor!=''">
+                  <xsl:attribute name="mathcolor" select="$mathcolor"/>
+                </xsl:if>
                 <xsl:value-of select="normalize-space(.)"/>
               </xsl:element>
             </xsl:matching-substring>
@@ -363,6 +370,9 @@
                 <xsl:matching-substring>
                   <xsl:element name="{mml:gen-name($parent, 'mi')}">
                     <xsl:attribute name="mathvariant" select="$mathvariant"/>
+                    <xsl:if test="$mathcolor!=''">
+                      <xsl:attribute name="mathcolor" select="$mathcolor"/>
+                    </xsl:if>
                     <xsl:value-of select="normalize-space(.)"/>
                   </xsl:element>
                 </xsl:matching-substring>
@@ -373,6 +383,9 @@
                     
                     <xsl:matching-substring>
                       <xsl:element name="{mml:gen-name($parent, 'mn')}">
+                        <xsl:if test="$mathcolor!=''">
+                          <xsl:attribute name="mathcolor" select="$mathcolor"/>
+                        </xsl:if>
                         <xsl:value-of select="normalize-space(.)"/>
                       </xsl:element>
                     </xsl:matching-substring>
@@ -384,9 +397,15 @@
                         <xsl:matching-substring>
                           <xsl:element name="{mml:gen-name($parent, 'mi')}">
                             <xsl:attribute name="mathvariant" select="$mathvariant"/>
+                            <xsl:if test="$mathcolor!=''">
+                              <xsl:attribute name="mathcolor" select="$mathcolor"/>
+                            </xsl:if>
                             <xsl:value-of select="regex-group(1)"/>
                           </xsl:element>
                           <xsl:element name="{mml:gen-name($parent, 'mo')}">
+                            <xsl:if test="$mathcolor!=''">
+                              <xsl:attribute name="mathcolor" select="$mathcolor"/>
+                            </xsl:if>
                             <xsl:value-of select="regex-group(2)"/>
                           </xsl:element>
                         </xsl:matching-substring>
@@ -398,6 +417,9 @@
                             
                             <xsl:matching-substring>
                               <xsl:element name="{mml:gen-name($parent, 'mi')}">
+                                <xsl:if test="$mathcolor!=''">
+                                  <xsl:attribute name="mathcolor" select="$mathcolor"/>
+                                </xsl:if>
                                 <xsl:attribute name="mathvariant" select="$mathvariant"/>
                                 <xsl:value-of select="normalize-space(.)"/>
                               </xsl:element>
@@ -409,11 +431,17 @@
                                                 and not($current/@xml:space eq 'preserve')">
                                   <xsl:element name="{mml:gen-name($parent, 'mi')}">
                                     <xsl:attribute name="mathvariant" select="$mathvariant"/>
+                                    <xsl:if test="$mathcolor!=''">
+                                      <xsl:attribute name="mathcolor" select="$mathcolor"/>
+                                    </xsl:if>
                                     <xsl:value-of select="normalize-space(.)"/>
                                   </xsl:element>
                                 </xsl:when>
                                 <xsl:when test="normalize-space(.)">
                                   <xsl:element name="{mml:gen-name($parent, 'mtext')}">
+                                    <xsl:if test="$mathcolor!=''">
+                                      <xsl:attribute name="mathcolor" select="$mathcolor"/>
+                                    </xsl:if>
                                     <xsl:value-of select="."/>
                                   </xsl:element>
                                 </xsl:when>
