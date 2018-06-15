@@ -234,6 +234,29 @@
     </xsl:copy>
     <xsl:apply-templates select="mrow/*[position() gt 1]" mode="#current"/>
   </xsl:template>
+  
+  <xsl:template match="mtd[maligngroup]" mode="mml2tex-preprocess">
+    <xsl:variable name="cur" select="." as="element()"/>
+    <xsl:if test="$cur/*[1]/self::maligngroup and ../../mtr/mtd[not(*[1]/self::maligngroup)]">
+      <mtd/>
+    </xsl:if>
+    <xsl:for-each-group select="node()" group-starting-with="maligngroup">
+      <xsl:element name="mtd" namespace="http://www.w3.org/1998/Math/MathML">
+        <xsl:attribute name="columnalign">
+          <xsl:choose>
+            <xsl:when test="$cur/@columnalign">
+              <xsl:sequence select="$cur/@columnalign"/>
+            </xsl:when>
+            <xsl:when test="current-group()[1]/self::maligngroup">left</xsl:when>
+            <xsl:otherwise>right</xsl:otherwise>
+          </xsl:choose>
+        </xsl:attribute>
+        <xsl:apply-templates select="$cur/@*, current-group()" mode="#current"/>
+      </xsl:element>
+    </xsl:for-each-group>
+  </xsl:template>
+  
+  <xsl:template match="mtd/maligngroup | mtd/*[last()][self::mspace][@linebreak= 'newline']" mode="mml2tex-preprocess"/>
 
   <xsl:template match="*[local-name() = ('mo', 'mi', 'mtext', 'mn')]
                         [matches(., concat('^', $mml2tex:functions-names-regex, '\d+([,\.]\d+)*$'))]" mode="mml2tex-preprocess">
