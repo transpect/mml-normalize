@@ -15,6 +15,7 @@
   <xsl:import href="function-names.xsl"/>
 
   <xsl:param name="dissolve-mspace-less-than-025em" select="true()" as="xs:boolean"/>
+  <xsl:param name="chars-from-which-to-convert-mi-to-mtext" select="5" as="xs:integer"/>
 
   <xsl:variable name="whitespace-regex" select="'\p{Zs}&#x200b;-&#x200f;'" as="xs:string"/>
   <xsl:variable name="wrapper-element-names" select="('msup', 'msub', 'msubsup', 'mfrac', 'mroot', 'mmultiscripts')" as="xs:string+"/>
@@ -37,10 +38,21 @@
       <xsl:apply-templates select="@*" mode="#current"/>
       <xsl:for-each-group select="*" 
         group-adjacent="concat(local-name(),
-                               string-join(for $i in @* except (@xml:space|@width) return concat($i/local-name(), $i), '-'),
+                               string-join(for $i in @* except (@xml:space|@width) 
+                                           return concat($i/local-name(), $i), '-'),
                                matches(., concat('^[\p{L}\p{P}', $whitespace-regex, ']+$'), 'i') or self::mspace
                                )">
           <xsl:choose>
+            <xsl:when test="current-group()/self::mi[every $i in 1 to ($chars-from-which-to-convert-mi-to-mtext - 1) 
+                                                     satisfies following-sibling::*[$i]/local-name() eq 'mi']">
+              <mtext mathvariant="{(@mathvariant, 'italic')[1]}">
+                <xsl:if test="not(every $i in current-group()/@mathvariant 
+                                  satisfies $i eq 'normal')">
+                  <xsl:attribute name="mathvariant" select="(@mathvariant, 'italic')[1]"/>
+                </xsl:if>
+                <xsl:apply-templates select="current-group()/@*, current-group()/node()" mode="#current"/>
+              </mtext>
+            </xsl:when>
             <xsl:when test="(current-group()/self::mtext 
                           or current-group()/self::mi[@mathvariant]
                           or current-group()/self::mspace)">
