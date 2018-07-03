@@ -370,7 +370,7 @@
     <xsl:variable name="current" select="." as="element(mtext)"/>
     <xsl:variable name="parent" select="parent::*" as="element()"/>
     <xsl:variable name="attributes" select="@*" as="attribute()*"/>
-    <xsl:variable name="mathvariant" select="(@mathvariant, 'normal')[1]" as="xs:string"/>
+    <xsl:variable name="mathvariant" select="(@mathvariant, 'bold-italic'[current()/@fontweight='bold'][current()/@fontstyle='italic'], @fontweight, @fontstyle, 'normal')[1]" as="xs:string"/>
     <xsl:variable name="new-mathml" as="element()+">
 
       <xsl:analyze-string select="." regex="{$regular-words-regex}">
