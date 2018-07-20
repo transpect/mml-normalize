@@ -18,7 +18,15 @@
   <xsl:param name="chars-from-which-to-convert-mi-to-mtext" select="5" as="xs:integer"/>
 
   <xsl:variable name="whitespace-regex" select="'\p{Zs}&#x200b;-&#x200f;'" as="xs:string"/>
-  <xsl:variable name="wrapper-element-names" select="('msup', 'msub', 'msubsup', 'mfrac', 'mroot', 'mmultiscripts')" as="xs:string+"/>
+  <xsl:variable name="wrapper-element-names" select="('msup', 
+                                                      'msub', 
+                                                      'msubsup', 
+                                                      'mfrac', 
+                                                      'mroot', 
+                                                      'mmultiscripts', 
+                                                      'mover', 
+                                                      'munder', 
+                                                      'munderover')" as="xs:string+"/>
   <xsl:variable name="sil-units-regex" select="'(m|g|s|A|K|mol|cd|rad|sr|GHz|Hz|N|Nm|Pa|J|W|C|V|F|Ω|S|Wb|T|H|°|°C|lm|lx|Bq|Gy|Sv|kat)'" as="xs:string+"/>
   <xsl:variable name="sil-unit-prefixes-regex" select="'(G|M|k|d|c|m|µ|n|p|f)'" as="xs:string+"/>
   
@@ -350,13 +358,14 @@
   <xsl:template match="mtext[matches(., concat('^[', $whitespace-regex, ']+$'))]
                             [not(parent::*/local-name() = $wrapper-element-names)]
                             [preceding::*[1]/ancestor-or-self::*[local-name() = ($non-whitespace-element-names, $non-text-element-names)][not(. = $punctuation-marks)] or
-                            following::*[1]/self::*[local-name() = ($non-whitespace-element-names, $non-text-element-names)][not(. = $punctuation-marks)]]" 
+                             following::*[1]/self::*[local-name() = ($non-whitespace-element-names, $non-text-element-names)][not(. = $punctuation-marks)]]" 
                 mode="mml2tex-preprocess" priority="1">
     <!-- Assigned priority to this template because it conflicted with the template in line 248 (as at this commit).
       It shouldn’t matter because they have the same effect. Only to avoid the warning. -->
   </xsl:template>
   
-  <xsl:template match="mtext[matches(., concat('^\s*', $mml2tex:operators-regex, '\s*$'))][not(matches(., concat('^[', $whitespace-regex, ']+$')))]" mode="mml2tex-preprocess">
+  <xsl:template match="mtext[matches(., concat('^\s*', $mml2tex:operators-regex, '\s*$'))]
+                            [not(matches(., concat('^[', $whitespace-regex, ']+$')))]" mode="mml2tex-preprocess">
     <xsl:element name="{mml:gen-name(parent::*, 'mo')}">
       <xsl:apply-templates select="@*" mode="#current"/>
       <xsl:value-of select="normalize-space(.)"/>
