@@ -84,9 +84,11 @@
     </xsl:copy>
   </xsl:template>
   
-  <xsl:template
-    match="*[local-name() = ('msub', 'msup')][empty((*[1]/@*, *[1]/node()))][following-sibling::*[1][local-name() = current()/local-name()]][empty((*[1]/@*, *[1]/node()))]"
-    mode="mml2tex-grouping">
+  <xsl:template match="*[local-name() = ('msub', 'msup')]
+                        [empty((*[1]/@*, *[1]/node()))]
+                        [following-sibling::*[1]
+                                             [local-name() = current()/local-name()]]"
+                mode="mml2tex-grouping">
     <xsl:variable name="localname" select="local-name()"/>
     <xsl:variable name="next-non-group-el" select="following-sibling::*[not(local-name() = $localname)][1]/generate-id()"/>
     <xsl:copy>
@@ -116,7 +118,11 @@
     </xsl:choose>
   </xsl:template>
     
-  <xsl:template match="*[local-name() = ('msub', 'msup')][empty((*[1]/@*, *[1]/node()))][preceding-sibling::*[1][local-name() = current()/local-name()]][empty((*[1]/@*, *[1]/node()))]" mode="mml2tex-grouping" priority="2"/>
+  <xsl:template match="*[local-name() = ('msub', 'msup')]
+                        [empty((*[1]/@*, *[1]/node()))]
+                        [preceding-sibling::*[1]
+                                             [local-name() = current()/local-name()]]" 
+                mode="mml2tex-grouping" priority="2"/>
   
   <!-- conclude three single mo elements with the '.' character to horizontal ellipsis -->
   <xsl:template match="mo[. = '.']
