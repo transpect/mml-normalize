@@ -217,7 +217,9 @@
   
   <xsl:template match="mspace[$dissolve-mspace-less-than-025em]
                              [xs:decimal(replace(@width, 'em$', '')) le 0.25]
-                             [not(preceding-sibling::*[1]/self::mtext or following-sibling::*[1]/self::mtext)]" mode="mml2tex-preprocess"/>
+                             [not(preceding-sibling::*[1]/self::mtext or following-sibling::*[1]/self::mtext)]" mode="mml2tex-preprocess">
+    <xsl:text>&#x20;</xsl:text>
+  </xsl:template>
   
   <!-- render thinspace between numbers and units -->
   
