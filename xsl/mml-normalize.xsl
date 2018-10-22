@@ -384,6 +384,10 @@
   
   <xsl:template match="mtext[not(matches(., concat('^[', $whitespace-regex, ']+$')) or processing-instruction())]" mode="mml2tex-preprocess" priority="10">
     <xsl:param name="regular-words-regex" select="'(\p{L}\p{L}+)([-\s]\p{L}\p{L}+)+\s*'" as="xs:string" tunnel="yes"/>
+    <!-- prevent some characters from faulty rendering
+      e.g. a legitimate en-dash = - - = would become visible double-minus 
+    => keep it as mtext, hopefully becomes \text environment -->
+    <xsl:variable name="text-char-regex" select="'[&#x2013;-&#x2014;&#x201c;-&#x201f;]'"/>
     <xsl:variable name="current" select="." as="element(mtext)"/>
     <xsl:variable name="parent" select="parent::*" as="element()"/>
     <xsl:variable name="attributes" select="@*" as="attribute()*"/>
@@ -465,7 +469,9 @@
                               <!-- map characters to mi -->
                               <xsl:choose>
                                 <xsl:when test="string-length(normalize-space(.)) lt 4
-                                                and not($current/@xml:space eq 'preserve')">
+                                                and not($current/@xml:space eq 'preserve')
+                                                and not(matches(., $text-char-regex))
+                                                ">
                                   <xsl:element name="{mml:gen-name($parent, 'mi')}">
                                     <xsl:attribute name="mathvariant" select="$mathvariant"/>
                                     <xsl:apply-templates select="$attributes[not(local-name() eq 'mathvariant')]" mode="#current"/>
