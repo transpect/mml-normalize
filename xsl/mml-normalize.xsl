@@ -456,7 +456,7 @@
                         <xsl:non-matching-substring>
                           
                           <!-- tag greeks  -->
-                          <xsl:analyze-string select="." regex="[&#x391;-&#x3c9;]">
+                          <xsl:analyze-string select="." regex="[&#x391;-&#x3c9;&#x3d0;-&#x3d2;&#x3d5;]">
                             
                             <xsl:matching-substring>
                               <xsl:element name="{mml:gen-name($parent, 'mi')}">
