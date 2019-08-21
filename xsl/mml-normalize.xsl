@@ -40,7 +40,9 @@
         * group adjacent mi and mtext tags with equivalent attributes
         * -->
   
-  <xsl:template match="*[count(mi) gt 1 or count(mtext) gt 1]
+  <xsl:template match="*[   count(mi) gt 1 
+                         or count(mtext) gt 1 
+                         or count(mspace) gt 1]
                         [not(local-name() = $wrapper-element-names)]" mode="mml2tex-grouping">
     <xsl:copy>
       <xsl:apply-templates select="@*" mode="#current"/>
