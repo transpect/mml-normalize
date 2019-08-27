@@ -277,6 +277,9 @@
             <xsl:when test="$cur/@columnalign">
               <xsl:sequence select="$cur/@columnalign"/>
             </xsl:when>
+            <xsl:when test="$cur/@groupalign">
+              <xsl:sequence select="$cur/@groupalign"/>
+            </xsl:when>
             <xsl:when test="current-group()[1]/self::maligngroup">left</xsl:when>
             <xsl:otherwise>right</xsl:otherwise>
           </xsl:choose>
