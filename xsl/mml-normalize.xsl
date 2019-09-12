@@ -29,6 +29,7 @@
                                                       'munderover')" as="xs:string+"/>
   <xsl:variable name="sil-units-regex" select="'(m|g|s|A|K|mol|cd|rad|sr|GHz|Hz|N|Nm|Pa|J|W|C|V|F|Ω|S|Wb|T|H|°|°C|lm|lx|Bq|Gy|Sv|kat)'" as="xs:string+"/>
   <xsl:variable name="sil-unit-prefixes-regex" select="'(G|M|k|d|c|m|µ|n|p|f)'" as="xs:string+"/>
+  <xsl:variable name="greek-chars-regex" select="'[&#x393;-&#x3f5;]'" as="xs:string"/>
   
   <xsl:template match="mml:math[every $i in .//mml:* 
                                 satisfies (string-length(normalize-space($i)) eq 0 and not($i/@*))]
@@ -51,7 +52,8 @@
                                string-join(for $i in @* except (@xml:space|@width) 
                                            return concat($i/local-name(), $i), '-'),
                                matches(., concat('^[\p{L}\p{P}', $whitespace-regex, ']+$'), 'i') or self::mspace,
-                               matches(., concat('^', $mml2tex:functions-names-regex, '$'))
+                               matches(., concat('^', $mml2tex:functions-names-regex, '$')),
+                               matches(., concat('^', $greek-chars-regex, '$'))
                                )">
           <xsl:choose>
             <xsl:when test="current-group()/self::mi[every $i in 1 to ($chars-from-which-to-convert-mi-to-mtext - 1) 
