@@ -50,7 +50,8 @@
         group-adjacent="concat(local-name(),
                                string-join(for $i in @* except (@xml:space|@width) 
                                            return concat($i/local-name(), $i), '-'),
-                               matches(., concat('^[\p{L}\p{P}', $whitespace-regex, ']+$'), 'i') or self::mspace
+                               matches(., concat('^[\p{L}\p{P}', $whitespace-regex, ']+$'), 'i') or self::mspace,
+                               matches(., concat('^', $mml2tex:functions-names-regex, '$'))
                                )">
           <xsl:choose>
             <xsl:when test="current-group()/self::mi[every $i in 1 to ($chars-from-which-to-convert-mi-to-mtext - 1) 
