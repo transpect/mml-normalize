@@ -51,7 +51,7 @@
         group-adjacent="concat(local-name(),
                                string-join(for $i in @* except (@xml:space|@width) 
                                            return concat($i/local-name(), $i), '-'),
-                               matches(., concat('^[\p{L}\p{P}', $whitespace-regex, ']+$'), 'i') or self::mspace,
+                               matches(., concat('^[\p{L}\p{P}', $whitespace-regex, ']+$'), 'i') or self::mspace[not(@linebreak)],
                                matches(., concat('^', $mml2tex:functions-names-regex, '$')),
                                matches(., concat('^', $greek-chars-regex, '$'))
                                )">
@@ -221,6 +221,7 @@
   <!-- dissolve mspace less equal than 0.25em -->
   
   <xsl:template match="mspace[$dissolve-mspace-less-than-025em]
+                             [not(@linebreak)]
                              [xs:decimal(replace(@width, 'em$', '')) le 0.25]
                              [not(preceding-sibling::*[1]/self::mtext or following-sibling::*[1]/self::mtext)]" mode="mml2tex-preprocess">
     <xsl:text>&#x20;</xsl:text>
@@ -231,7 +232,9 @@
   <xsl:template match="mspace[xs:decimal(replace(@width, 'em$', '')) le 0.25]
                              [matches(normalize-space(string-join(preceding-sibling::*[1]//text(), '')), '\d$')
                               and matches(normalize-space(string-join(following-sibling::*[1], '')), concat('^', $sil-unit-prefixes-regex, '?', $sil-units-regex))]" mode="mml2tex-preprocess" priority="2">
-    <mspace width="0.16em"/>
+    <mspace width="0.16em">
+      <xsl:apply-templates select="@* except @linebreak" mode="#current"/>
+    </mspace>
   </xsl:template>
   
   <xsl:template match="*[local-name() = ('mi', 'mtext')][. eq ' ']
