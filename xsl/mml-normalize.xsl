@@ -27,8 +27,8 @@
                                                       'mover', 
                                                       'munder', 
                                                       'munderover')" as="xs:string+"/>
-  <xsl:variable name="sil-units-regex" select="'(m|g|s|A|K|mol|cd|rad|sr|GHz|Hz|N|Nm|Pa|J|W|C|V|F|Ω|S|Wb|T|H|°|°C|lm|lx|Bq|Gy|Sv|kat)'" as="xs:string+"/>
-  <xsl:variable name="sil-unit-prefixes-regex" select="'(G|M|k|d|c|m|µ|n|p|f)'" as="xs:string+"/>
+  <xsl:variable name="sil-units-regex" select="'(m|g|s|A|K|mol|cd|rad|sr|GHz|Hz|N|Nm|Pa|J|W|C|V|F|Ω|S|Wb|T|H|°|°C|lm|lx|Bq|Gy|Sv|kat)'" as="xs:string"/>
+  <xsl:variable name="sil-unit-prefixes-regex" select="'(G|M|k|d|c|m|µ|n|p|f)'" as="xs:string"/>
   <xsl:variable name="greek-chars-regex" select="'[&#x393;-&#x3f5;]'" as="xs:string"/>
   
   <xsl:template match="mml:math[every $i in .//mml:* 
