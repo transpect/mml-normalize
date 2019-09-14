@@ -222,15 +222,24 @@
   
   <xsl:template match="mspace[not(@linebreak)]
                              [xs:decimal(replace(@width, 'em$', '')) le $remove-mspace-treshold-em]
-                             [not(preceding-sibling::*[1]/self::mtext or following-sibling::*[1]/self::mtext)]" mode="mml2tex-preprocess">
+                             [not(preceding-sibling::*[1]/self::mtext or following-sibling::*[1]/self::mtext)]"
+                mode="mml2tex-preprocess">
     <xsl:text>&#x20;</xsl:text>
+  </xsl:template>
+  
+  <xsl:template match="mspace[not(@linebreak)]
+                             [xs:decimal(replace(@width, 'em$', '')) le 0.25]
+                             [preceding-sibling::*[1]/self::mo or following-sibling::*[1]/self::mo]"
+                priority="5" mode="mml2tex-preprocess">
   </xsl:template>
   
   <!-- render thinspace between numbers and units -->
   
-  <xsl:template match="mspace[xs:decimal(replace(@width, 'em$', '')) le 0.25]
+  <xsl:template mode="mml2tex-preprocess" priority="2"
+                match="mspace[xs:decimal(replace(@width, 'em$', '')) le 0.25]
                              [matches(normalize-space(string-join(preceding-sibling::*[1]//text(), '')), '\d$')
-                              and matches(normalize-space(string-join(following-sibling::*[1], '')), concat('^', $sil-unit-prefixes-regex, '?', $sil-units-regex))]" mode="mml2tex-preprocess" priority="2">
+                              and matches(normalize-space(string-join(following-sibling::*[1], '')), 
+                                          concat('^', $sil-unit-prefixes-regex, '?', $sil-units-regex))]">
     <mspace width="0.16em">
       <xsl:apply-templates select="@* except @linebreak" mode="#current"/>
     </mspace>
