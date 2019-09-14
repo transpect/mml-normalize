@@ -14,7 +14,7 @@
   <xsl:import href="operators.xsl"/>
   <xsl:import href="function-names.xsl"/>
 
-  <xsl:param name="dissolve-mspace-less-than-025em" select="true()" as="xs:boolean"/>
+  <xsl:param name="remove-mspace-treshold-em" select="0.16" as="xs:decimal"/>
   <xsl:param name="chars-from-which-to-convert-mi-to-mtext" select="5" as="xs:integer"/>
 
   <xsl:variable name="whitespace-regex" select="'\p{Zs}&#x200b;-&#x200f;'" as="xs:string"/>
@@ -220,9 +220,8 @@
   
   <!-- dissolve mspace less equal than 0.25em -->
   
-  <xsl:template match="mspace[$dissolve-mspace-less-than-025em]
-                             [not(@linebreak)]
-                             [xs:decimal(replace(@width, 'em$', '')) le 0.25]
+  <xsl:template match="mspace[not(@linebreak)]
+                             [xs:decimal(replace(@width, 'em$', '')) le $remove-mspace-treshold-em]
                              [not(preceding-sibling::*[1]/self::mtext or following-sibling::*[1]/self::mtext)]" mode="mml2tex-preprocess">
     <xsl:text>&#x20;</xsl:text>
   </xsl:template>
