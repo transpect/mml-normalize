@@ -187,7 +187,7 @@
                                                  and *[1][matches(., concat('^[', $whitespace-regex, ']$'))]
                                                  and not(*[2][matches(., concat('^[', $whitespace-regex, ']$'))])
                                                  and not(*[3][matches(., concat('^[', $whitespace-regex, ']$'))])
-                                                 ]]" mode="mml2tex-preprocess"/>
+                                                 ]]" mode="mml2tex-preprocess" priority="+10.1"/>
   
   <xsl:template match="msubsup[*[1][matches(., concat('^[', $whitespace-regex, ']$'))]
                                and not(*[2][matches(., concat('^[', $whitespace-regex, ']$'))])
