@@ -458,7 +458,7 @@
                     <xsl:non-matching-substring>
                       
                       <!-- tag derivates -->
-                      <xsl:analyze-string select="." regex="([a-zA-Z])(')+">
+                      <xsl:analyze-string select="." regex="([a-zA-Z]+)('+)+">
                         
                         <xsl:matching-substring>
                           <xsl:element name="{mml:gen-name($parent, 'mi')}">
