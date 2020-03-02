@@ -264,6 +264,12 @@
     </xsl:copy>
   </xsl:template>
   
+  <!-- use no msup for primes to prevent bad scaling -->
+  
+  <xsl:template match="msup[count(*) eq 2][matches(*[2], '^''+$')]" mode="mml2tex-preprocess">
+    <xsl:apply-templates select="*" mode="#current"/>
+  </xsl:template>
+  
   <!-- resolve nested mmultiscripts when authors put tensors in the base of tensors by accident (MS Word equation editor) -->
   
   <xsl:template match="mmultiscripts/mrow[mmultiscripts]" mode="mml2tex-preprocess">
