@@ -367,7 +367,7 @@
   
   <!-- parse mtext and map to proper mathml elements -->
   
-  <xsl:variable name="mi-regex" select="concat('((', $mml2tex:functions-names-regex, ')|([\p{L}])' ,')')" as="xs:string"/>
+  <xsl:variable name="mi-regex" select="concat('((', $mml2tex:functions-names-regex, ')|([\p{L}-[&#192;-&#214;&#217;-&#246;&#249;-&#509;]])' ,')')" as="xs:string"/>
   
   <xsl:template match="mtext[matches(., concat('^\s*', $mi-regex, '\s*$'))]" mode="mml2tex-preprocess">
     <xsl:element name="{mml:gen-name(parent::*, 'mi')}">
@@ -412,7 +412,7 @@
     <!-- prevent some characters from faulty rendering
       e.g. a legitimate en-dash = - - = would become visible double-minus 
     => keep it as mtext, hopefully becomes \text environment -->
-    <xsl:variable name="text-char-regex" select="'[&#x2013;-&#x2014;&#x201c;-&#x201f;]'"/>
+    <xsl:variable name="text-char-regex" select="'[&#x2013;-&#x2014;&#x201c;-&#x201f;&#192;-&#214;&#217;-&#246;&#249;-&#509;]'"/>
     <xsl:variable name="current" select="." as="element(mtext)"/>
     <xsl:variable name="parent" select="parent::*" as="element()"/>
     <xsl:variable name="attributes" select="@*" as="attribute()*"/>
