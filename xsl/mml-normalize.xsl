@@ -367,7 +367,11 @@
   
   <!-- parse mtext and map to proper mathml elements -->
   
-  <xsl:variable name="mi-regex" select="concat('((', $mml2tex:functions-names-regex, ')|([\p{L}-[&#192;-&#214;&#217;-&#246;&#249;-&#509;]])' ,')')" as="xs:string"/>
+  <xsl:variable name="mi-regex" as="xs:string" 
+                select="concat('((', 
+                               $mml2tex:functions-names-regex, 
+                               ')|([a-zA-Z])'
+                               ,')')"/>
   
   <xsl:template match="mtext[matches(., concat('^\s*', $mi-regex, '\s*$'))]" mode="mml2tex-preprocess">
     <xsl:element name="{mml:gen-name(parent::*, 'mi')}">
@@ -407,16 +411,32 @@
   
   <!-- to-do group mtext in 1st mode and text heurstics in another mode or try matching to mtext/text() -->
   
-  <xsl:template match="mtext[not(matches(., concat('^[', $whitespace-regex, ']+$')) or processing-instruction())]" mode="mml2tex-preprocess" priority="10">
+  <xsl:template match="mtext[not(   matches(., 
+                                         concat('^[', $whitespace-regex, ']+$')) 
+                                 or processing-instruction())]" 
+                mode="mml2tex-preprocess" priority="10">
     <xsl:param name="regular-words-regex" select="'(\p{L}\p{L}+)([-\s]\p{L}\p{L}+)+\s*'" as="xs:string" tunnel="yes"/>
     <!-- prevent some characters from faulty rendering
       e.g. a legitimate en-dash = - - = would become visible double-minus 
     => keep it as mtext, hopefully becomes \text environment -->
-    <xsl:variable name="text-char-regex" select="'[&#x2013;-&#x2014;&#x201c;-&#x201f;&#192;-&#214;&#217;-&#246;&#249;-&#509;]'"/>
+    <xsl:variable name="text-char-regex" as="xs:string" 
+                  select="concat('[',
+                                 '&#x2013;-&#x2014;',
+                                 '&#x201c;-&#x201f;',
+                                 '&#xc0;-&#xd6;', 
+                                 '&#xd9;-&#xf6;',
+                                 '&#xf9;-&#x1fd;',
+                                 ']')"/>
     <xsl:variable name="current" select="." as="element(mtext)"/>
     <xsl:variable name="parent" select="parent::*" as="element()"/>
     <xsl:variable name="attributes" select="@*" as="attribute()*"/>
-    <xsl:variable name="mathvariant" select="(@mathvariant, 'bold-italic'[current()/@fontweight='bold'][current()/@fontstyle='italic'], @fontweight, @fontstyle, 'normal')[1]" as="xs:string"/>
+    <xsl:variable name="mathvariant" 
+                  select="(@mathvariant, 
+                           'bold-italic'[current()/@fontweight='bold']
+                                        [current()/@fontstyle='italic'], 
+                           @fontweight, 
+                           @fontstyle, 
+                           'normal')[1]" as="xs:string"/>
     <xsl:variable name="new-mathml" as="element()+">
 
       <xsl:analyze-string select="." regex="{$regular-words-regex}">
