@@ -370,7 +370,7 @@
   <xsl:variable name="mi-regex" as="xs:string" 
                 select="concat('((', 
                                $mml2tex:functions-names-regex, 
-                               ')|([a-zA-Z])'
+                               ')|([a-zA-Z&#x391;-&#x3f6;])'
                                ,')')"/>
   
   <xsl:template match="mtext[matches(., concat('^\s*', $mi-regex, '\s*$'))]" mode="mml2tex-preprocess">
