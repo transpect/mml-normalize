@@ -58,13 +58,14 @@
           <xsl:choose>
             <xsl:when test="current-group()/self::mi[every $i in 1 to ($chars-from-which-to-convert-mi-to-mtext - 1) 
                                                      satisfies following-sibling::*[$i]/local-name() eq 'mi']">
-              <mtext mathvariant="{(@mathvariant, 'italic')[1]}">
+              <xsl:element name="mtext">
+              <xsl:attribute name="mathvariant" select="(@mathvariant, 'italic')[1]"/>
                 <xsl:if test="not(every $i in current-group()/@mathvariant 
                                   satisfies $i eq 'normal')">
                   <xsl:attribute name="mathvariant" select="(@mathvariant, 'italic')[1]"/>
                 </xsl:if>
                 <xsl:apply-templates select="current-group()/@*, current-group()/node()" mode="#current"/>
-              </mtext>
+              </xsl:element>
             </xsl:when>
             <xsl:when test="(current-group()/self::mtext 
                           or current-group()/self::mi[@mathvariant]
