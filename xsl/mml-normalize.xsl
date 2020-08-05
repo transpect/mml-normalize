@@ -182,10 +182,10 @@
   </xsl:template>
 
   <!-- map combining dot above (i.e. <mml:mtext>V̇O</mml:mtext>) to mml:mover -->
-  <xsl:template match="mtext[matches(., '.&#x307;')]" mode="mml2tex-grouping"
+  <xsl:template match="mtext[matches(., '.[&#x300;-&#x36f;&#x2d9;]')]" mode="mml2tex-grouping"
      xmlns="http://www.w3.org/1998/Math/MathML">
     <xsl:variable name="context" select="."/>
-    <xsl:analyze-string select="." regex="(.)&#x307;">
+    <xsl:analyze-string select="." regex="(.)([&#x300;-&#x36f;])">
       <xsl:matching-substring>
         <mover>
           <mi>
@@ -194,7 +194,7 @@
             <xsl:value-of select="regex-group(1)"/>
           </mi>
           <mo>
-            <xsl:text>&#x2d9;</xsl:text>
+            <xsl:value-of select="regex-group(2)"/>
           </mo>
         </mover>
       </xsl:matching-substring>
@@ -207,6 +207,20 @@
       </xsl:non-matching-substring>
     </xsl:analyze-string>
   </xsl:template>
+
+  <xsl:template mode="mml2tex-grouping" xmlns="http://www.w3.org/1998/Math/MathML"
+    match="*[local-name() = ('math', 'mrow')]/mi[following-sibling::node()[1]/self::mo[matches(., '^[&#x300;-&#x36f;&#x2d9;]$')]]">
+    <mover>
+      <mi>
+        <xsl:apply-templates select="@*, node()"/>
+      </mi>
+      <mo>
+        <xsl:text>&#x2d9;</xsl:text>
+      </mo>
+    </mover>
+  </xsl:template>
+  <xsl:template mode="mml2tex-grouping"
+    match="*[local-name() = ('math', 'mrow')]/mo[matches(., '^[&#x300;-&#x36f;]$')][preceding-sibling::node()[1]/self::mi]"/>
 
   <!-- regroup msubsups with empty argument -->
   
