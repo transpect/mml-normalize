@@ -181,6 +181,33 @@
     <xsl:apply-templates select="*[1]" mode="#current"/>
   </xsl:template>
 
+  <!-- map combining dot above (i.e. <mml:mtext>V̇O</mml:mtext>) to mml:mover -->
+  <xsl:template match="mtext[matches(., '.&#x307;')]" mode="mml2tex-grouping"
+     xmlns="http://www.w3.org/1998/Math/MathML">
+    <xsl:variable name="context" select="."/>
+    <xsl:analyze-string select="." regex="(.)&#x307;">
+      <xsl:matching-substring>
+        <mover>
+          <mi>
+            <xsl:attribute name="mathvariant" select="'normal'"/>
+            <xsl:apply-templates select="$context/@*"/>
+            <xsl:value-of select="regex-group(1)"/>
+          </mi>
+          <mo>
+            <xsl:text>&#x2d9;</xsl:text>
+          </mo>
+        </mover>
+      </xsl:matching-substring>
+      <xsl:non-matching-substring>
+        <xsl:element name="{if(string-length(.) = 1) then 'mi' else 'mtext'}">
+          <xsl:attribute name="mathvariant" select="'normal'"/>
+          <xsl:apply-templates select="$context/@*"/>
+          <xsl:value-of select="."/>
+        </xsl:element>
+      </xsl:non-matching-substring>
+    </xsl:analyze-string>
+  </xsl:template>
+
   <!-- regroup msubsups with empty argument -->
   
   <xsl:template match="*[local-name() = ('mi', 'mn', 'mtext')]
