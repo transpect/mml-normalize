@@ -185,7 +185,7 @@
   <xsl:template match="mtext[matches(., '.[&#x300;-&#x36f;&#x2d9;]')]" mode="mml2tex-grouping"
      xmlns="http://www.w3.org/1998/Math/MathML">
     <xsl:variable name="context" select="."/>
-    <xsl:analyze-string select="." regex="(.)([&#x300;-&#x36f;])">
+    <xsl:analyze-string select="." regex="(.)([&#x300;-&#x36f;&#x2d9;])">
       <xsl:matching-substring>
         <mover>
           <mi>
@@ -220,7 +220,7 @@
     </mover>
   </xsl:template>
   <xsl:template mode="mml2tex-grouping"
-    match="*[local-name() = ('math', 'mrow')]/mo[matches(., '^[&#x300;-&#x36f;]$')][preceding-sibling::node()[1]/self::mi]"/>
+    match="*[local-name() = ('math', 'mrow')]/mo[matches(., '^[&#x300;-&#x36f;&#x2d9;]$')][preceding-sibling::node()[1]/self::mi]"/>
 
   <!-- regroup msubsups with empty argument -->
   
