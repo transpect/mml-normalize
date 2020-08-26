@@ -260,7 +260,7 @@
     <xsl:apply-templates select="*[1]" mode="#current"/>
   </xsl:template>
   
-  <!-- dissolve mspace less equal than 0.25em -->
+  <!-- dissolve mspace less equal than mspace treshold -->
   
   <xsl:template match="mspace[not(@linebreak)]
                              [xs:decimal(replace(@width, 'em$', '')) le $remove-mspace-treshold-em]
@@ -268,6 +268,8 @@
                 mode="mml2tex-preprocess">
     <xsl:text>&#x20;</xsl:text>
   </xsl:template>
+  
+  <!-- remove space preceded or followed by operators-->
   
   <xsl:template match="mspace[not(@linebreak)]
                              [xs:decimal(replace(@width, 'em$', '')) le 0.25]
