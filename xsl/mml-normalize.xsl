@@ -159,7 +159,7 @@
               else if(. eq 'negativeveryverythickmathspace') then -0.388
               else                                                ()"/>
     <xsl:attribute name="width">
-      <xsl:value-of select="($em-width, @width)[1]"/>
+      <xsl:value-of select="if($em-width) then concat($em-width, 'em') else ."/>
     </xsl:attribute>
   </xsl:template>
   
