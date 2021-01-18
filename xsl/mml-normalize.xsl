@@ -141,8 +141,8 @@
   
   <!-- transform literal mspace width values to em -->
   
-  <xsl:function name="mml:replace-literal-mspace">
-    <xsl:param name="width"/>
+  <xsl:function name="mml:replace-literal-mspace" as="xs:string">
+    <xsl:param name="width" as="xs:string"/>
     <xsl:variable name="em-width" as="xs:decimal?" 
       select="     if($width eq 'veryverythinmathspace')          then  0.055
       else if($width eq 'verythinmathspace')              then  0.111
@@ -159,15 +159,11 @@
       else if($width eq 'negativeverythickmathspace')     then -0.333
       else if($width eq 'negativeveryverythickmathspace') then -0.388
       else                                                ()"/>
-    
-    <xsl:sequence select="if($em-width) then concat($em-width, 'em') else $width"/>
+    <xsl:sequence select="if(exists($em-width)) then concat($em-width, 'em') else $width"/>
   </xsl:function>
   
   <xsl:template match="mspace[matches(@width, '^[a-z]+$')]/@width" mode="mml2tex-grouping">
-    <xsl:variable name="em-width" select="mml:replace-literal-mspace(.)"/>
-    <xsl:attribute name="width">
-      <xsl:value-of select="if($em-width) then concat($em-width, 'em') else ."/>
-    </xsl:attribute>
+      <xsl:attribute name="width" select="mml:replace-literal-mspace(.)"/>
   </xsl:template>
   
   <xsl:template match="  mo[. = '.']
