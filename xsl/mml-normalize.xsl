@@ -139,6 +139,30 @@
     </mo>
   </xsl:template>
   
+  <!-- transform literal mspace width values to em -->
+  
+  <xsl:template match="mspace[matches(@width, '^[a-z]+$')]/@width" mode="mml2tex-grouping">
+    <xsl:variable name="em-width" as="xs:decimal?" 
+      select="     if(. eq 'veryverythinmathspace')          then  0.055
+              else if(. eq 'verythinmathspace')              then  0.111
+              else if(. eq 'thinmathspace')                  then  0.167
+              else if(. eq 'mediummathspace')                then  0.222
+              else if(. eq 'thickmathspace')                 then  0.277
+              else if(. eq 'verythickmathspace')             then  0.333
+              else if(. eq 'veryverythickmathspace')         then  0.388
+              else if(. eq 'negativeveryverythinmathspace')  then -0.055
+              else if(. eq 'negativeverythinmathspace')      then -0.111
+              else if(. eq 'negativethinmathspace')          then -0.167
+              else if(. eq 'negativemediummathspace')        then -0.222
+              else if(. eq 'negativethickmathspace')         then -0.277
+              else if(. eq 'negativeverythickmathspace')     then -0.333
+              else if(. eq 'negativeveryverythickmathspace') then -0.388
+              else                                                ()"/>
+    <xsl:attribute name="width">
+      <xsl:value-of select="($em-width, @width)[1]"/>
+    </xsl:attribute>
+  </xsl:template>
+  
   <xsl:template match="  mo[. = '.']
                            [not(following-sibling::*[1]/self::mo[. = '.'])]
                            [preceding-sibling::*[1]/self::mo[. = '.']]
