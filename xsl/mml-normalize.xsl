@@ -74,7 +74,7 @@
                 <xsl:apply-templates select="current-group()/@*[not(local-name() eq 'width')]" mode="#current"/>
                 <xsl:if test="current-group()/@width">
                   <xsl:variable name="total-width" select="sum(for $i in current-group()/@width 
-                                                               return xs:decimal(replace($i, 'em$', '')))" as="xs:decimal"/>
+                                                               return xs:decimal(replace(mml:replace-literal-mspace($i), 'em$', '')))" as="xs:decimal"/>
                   <xsl:attribute name="width" select="concat(xs:string($total-width), 'em')"/>
                 </xsl:if>
                 <xsl:apply-templates select="current-group()/node()" mode="#current"/>
@@ -141,23 +141,30 @@
   
   <!-- transform literal mspace width values to em -->
   
-  <xsl:template match="mspace[matches(@width, '^[a-z]+$')]/@width" mode="mml2tex-grouping">
+  <xsl:function name="mml:replace-literal-mspace">
+    <xsl:param name="width"/>
     <xsl:variable name="em-width" as="xs:decimal?" 
-      select="     if(. eq 'veryverythinmathspace')          then  0.055
-              else if(. eq 'verythinmathspace')              then  0.111
-              else if(. eq 'thinmathspace')                  then  0.167
-              else if(. eq 'mediummathspace')                then  0.222
-              else if(. eq 'thickmathspace')                 then  0.277
-              else if(. eq 'verythickmathspace')             then  0.333
-              else if(. eq 'veryverythickmathspace')         then  0.388
-              else if(. eq 'negativeveryverythinmathspace')  then -0.055
-              else if(. eq 'negativeverythinmathspace')      then -0.111
-              else if(. eq 'negativethinmathspace')          then -0.167
-              else if(. eq 'negativemediummathspace')        then -0.222
-              else if(. eq 'negativethickmathspace')         then -0.277
-              else if(. eq 'negativeverythickmathspace')     then -0.333
-              else if(. eq 'negativeveryverythickmathspace') then -0.388
-              else                                                ()"/>
+      select="     if($width eq 'veryverythinmathspace')          then  0.055
+      else if($width eq 'verythinmathspace')              then  0.111
+      else if($width eq 'thinmathspace')                  then  0.167
+      else if($width eq 'mediummathspace')                then  0.222
+      else if($width eq 'thickmathspace')                 then  0.277
+      else if($width eq 'verythickmathspace')             then  0.333
+      else if($width eq 'veryverythickmathspace')         then  0.388
+      else if($width eq 'negativeveryverythinmathspace')  then -0.055
+      else if($width eq 'negativeverythinmathspace')      then -0.111
+      else if($width eq 'negativethinmathspace')          then -0.167
+      else if($width eq 'negativemediummathspace')        then -0.222
+      else if($width eq 'negativethickmathspace')         then -0.277
+      else if($width eq 'negativeverythickmathspace')     then -0.333
+      else if($width eq 'negativeveryverythickmathspace') then -0.388
+      else                                                ()"/>
+    
+    <xsl:sequence select="if($em-width) then concat($em-width, 'em') else $width"/>
+  </xsl:function>
+  
+  <xsl:template match="mspace[matches(@width, '^[a-z]+$')]/@width" mode="mml2tex-grouping">
+    <xsl:variable name="em-width" select="mml:replace-literal-mspace(.)"/>
     <xsl:attribute name="width">
       <xsl:value-of select="if($em-width) then concat($em-width, 'em') else ."/>
     </xsl:attribute>
