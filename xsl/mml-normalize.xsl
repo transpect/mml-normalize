@@ -490,6 +490,7 @@
     <!-- prevent some characters from faulty rendering
       e.g. a legitimate en-dash = - - = would become visible double-minus 
     => keep it as mtext, hopefully becomes \text environment -->
+    <xsl:variable name="context" as="element(mtext)" select="."/>
     <xsl:variable name="text-char-regex" as="xs:string" 
                   select="concat('[',
                                  '&#x2013;-&#x2014;',
@@ -508,7 +509,7 @@
                            @fontweight, 
                            @fontstyle, 
                            'normal')[1]" as="xs:string"/>
-    <xsl:variable name="new-mathml" as="element()+">
+    <xsl:variable name="new-mathml" as="element()*">
 
       <xsl:analyze-string select="." regex="{$regular-words-regex}">
   
@@ -616,6 +617,9 @@
       </xsl:analyze-string>
     </xsl:variable>
     <xsl:choose>
+      <xsl:when test="count($new-mathml) = 0">
+        <xsl:message terminate="yes" select="'Unexpected empty result from ', $context, ' (not totally unexpected: it can happen for empty mtext elements)'"/>
+      </xsl:when>
       <xsl:when test="count($new-mathml) gt 1">
         <mrow>
           <xsl:sequence select="$new-mathml"/>
