@@ -145,20 +145,20 @@
     <xsl:param name="width" as="xs:string"/>
     <xsl:variable name="em-width" as="xs:decimal?" 
       select="     if($width eq 'veryverythinmathspace')          then  0.055
-      else if($width eq 'verythinmathspace')              then  0.111
-      else if($width eq 'thinmathspace')                  then  0.167
-      else if($width eq 'mediummathspace')                then  0.222
-      else if($width eq 'thickmathspace')                 then  0.277
-      else if($width eq 'verythickmathspace')             then  0.333
-      else if($width eq 'veryverythickmathspace')         then  0.388
-      else if($width eq 'negativeveryverythinmathspace')  then -0.055
-      else if($width eq 'negativeverythinmathspace')      then -0.111
-      else if($width eq 'negativethinmathspace')          then -0.167
-      else if($width eq 'negativemediummathspace')        then -0.222
-      else if($width eq 'negativethickmathspace')         then -0.277
-      else if($width eq 'negativeverythickmathspace')     then -0.333
-      else if($width eq 'negativeveryverythickmathspace') then -0.388
-      else                                                ()"/>
+              else if($width eq 'verythinmathspace')              then  0.111
+              else if($width eq 'thinmathspace')                  then  0.167
+              else if($width eq 'mediummathspace')                then  0.222
+              else if($width eq 'thickmathspace')                 then  0.277
+              else if($width eq 'verythickmathspace')             then  0.333
+              else if($width eq 'veryverythickmathspace')         then  0.388
+              else if($width eq 'negativeveryverythinmathspace')  then -0.055
+              else if($width eq 'negativeverythinmathspace')      then -0.111
+              else if($width eq 'negativethinmathspace')          then -0.167
+              else if($width eq 'negativemediummathspace')        then -0.222
+              else if($width eq 'negativethickmathspace')         then -0.277
+              else if($width eq 'negativeverythickmathspace')     then -0.333
+              else if($width eq 'negativeveryverythickmathspace') then -0.388
+              else                                                     ()"/>
     <xsl:sequence select="if(exists($em-width)) then concat($em-width, 'em') else $width"/>
   </xsl:function>
   
