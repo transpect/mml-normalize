@@ -639,6 +639,21 @@
                           else $name"/>
   </xsl:function>
   
+  <!-- resolve accent acute -->
+  
+  <xsl:variable name="accent-regex" select="'^[&#x60;&#xb4;&#x300;&#x301;]$'" as="xs:string"/>
+  
+  <xsl:template match="mi[following-sibling::*[1][self::mstyle]/*[matches(., $accent-regex)]]
+                      |mi[following-sibling::*[1][matches(., $accent-regex)]]" mode="mml2tex-preprocess">
+    <xsl:copy>
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+    </xsl:copy>
+    <mi>'</mi>
+  </xsl:template>
+  
+  <xsl:template match="*[not(*)][matches(., $accent-regex)]
+                      |mstyle[count(*) eq 1 and *[not(*)][matches(., $accent-regex)]]" mode="mml2tex-preprocess"/>
+  
   <!-- identity template -->
   
   <xsl:template match="*|@*|processing-instruction()" mode="mml2tex-grouping mml2tex-preprocess">
