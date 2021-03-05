@@ -652,7 +652,7 @@
   </xsl:template>
   
   <xsl:template match="*[not(*)][matches(., $accent-regex)]
-                      |mstyle[count(*) eq 1 and *[not(*)][matches(., $accent-regex)]]" mode="mml2tex-preprocess"/>
+                      |mstyle[count(*) eq 1 and *[not(*)][matches(., $accent-regex)]]" mode="mml2tex-preprocess" priority="20"/>
   
   <!-- identity template -->
   
