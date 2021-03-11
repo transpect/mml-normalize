@@ -641,18 +641,16 @@
   
   <!-- resolve accent acute -->
   
-  <xsl:variable name="accent-regex" select="'^[&#x60;&#xb4;&#x300;&#x301;]$'" as="xs:string"/>
+  <!-- sync with $diacritics-regex in mml2tex -->
+  <xsl:variable name="accent-regex" select="'^[&#x60;&#xA8;&#xB4;&#xb8;&#x2c6;&#x2c7;&#x2d8;-&#x2dd;&#x300;-&#x338;&#x20d0;-&#x20ef;]$'" as="xs:string"/>
   
-  <xsl:template match="mi[following-sibling::*[1][self::mstyle]/*[matches(., $accent-regex)]]
-                      |mi[following-sibling::*[1][matches(., $accent-regex)]]" mode="mml2tex-preprocess">
-    <xsl:copy>
-      <xsl:apply-templates select="@*, node()" mode="#current"/>
-    </xsl:copy>
-    <mi>'</mi>
+  <!-- Always put an accent that is in a non-mi element or whose element is wrapped in mstyle into an mi: --> 
+  <xsl:template match="*[empty(self::mi | self::mstyle)][empty(*)][matches(., $accent-regex)]
+                      |mstyle[count(*) eq 1 and *[empty(*)][matches(., $accent-regex)]]" mode="mml2tex-preprocess" priority="20">
+    <mi>
+      <xsl:apply-templates select="(self::mstyle/* | self::*[empty(self::mstyle)])/(@* | node())" mode="#current"></xsl:apply-templates>
+    </mi>
   </xsl:template>
-  
-  <xsl:template match="*[not(*)][matches(., $accent-regex)]
-                      |mstyle[count(*) eq 1 and *[not(*)][matches(., $accent-regex)]]" mode="mml2tex-preprocess" priority="20"/>
   
   <!-- identity template -->
   
