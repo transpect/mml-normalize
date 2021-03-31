@@ -67,9 +67,10 @@
                 <xsl:apply-templates select="current-group()/@*, current-group()/node()" mode="#current"/>
               </xsl:element>
             </xsl:when>
-            <xsl:when test="(current-group()/self::mtext 
-                          or current-group()/self::mi[@mathvariant]
-                          or current-group()/self::mspace)">
+            <xsl:when test="exists(current-group()/self::mtext 
+                                   | current-group()/self::mi[@mathvariant]
+                                   | current-group()/self::mspace)
+                            and (every $w in current-group()/@width satisfies (matches($w, '^[\d.]+em$')))">
               <xsl:element name="{name()}">
                 <xsl:apply-templates select="current-group()/@*[not(local-name() eq 'width')]" mode="#current"/>
                 <xsl:if test="current-group()/@width">
@@ -99,7 +100,7 @@
     <xsl:variable name="next-non-group-el" select="following-sibling::*[not(local-name() = $localname)][1]/generate-id()"/>
     <xsl:copy>
       <xsl:apply-templates select="*[1]" mode="#current"/>
-      <xsl:variable name="mrow">
+      <xsl:variable name="_mrow">
         <mrow>
           <xsl:apply-templates
             select="*[2], following-sibling::*[following-sibling::*/generate-id() = $next-non-group-el]/*[2]"
@@ -108,7 +109,7 @@
           </xsl:apply-templates>
         </mrow>
       </xsl:variable>
-      <xsl:apply-templates select="$mrow" mode="#current"/>
+      <xsl:apply-templates select="$_mrow" mode="#current"/>
     </xsl:copy>
   </xsl:template>
     
@@ -290,7 +291,8 @@
   <!-- dissolve mspace less equal than mspace treshold -->
   
   <xsl:template match="mspace[not(@linebreak)]
-                             [xs:decimal(replace(@width, 'em$', '')) le $remove-mspace-treshold-em]
+                             [@width[matches(., '^[\d.]+em$')]
+                                    [xs:decimal(replace(., 'em$', '')) le $remove-mspace-treshold-em]]
                              [not(preceding-sibling::*[1]/self::mtext or following-sibling::*[1]/self::mtext)]"
                 mode="mml2tex-preprocess">
     <xsl:text>&#x20;</xsl:text>
@@ -299,7 +301,8 @@
   <!-- remove space preceded or followed by operators-->
   
   <xsl:template match="mspace[not(@linebreak)]
-                             [xs:decimal(replace(@width, 'em$', '')) le 0.25]
+                             [@width[matches(., '^[\d.]+em$')]
+                                    [xs:decimal(replace(., 'em$', '')) le 0.25]]
                              [preceding-sibling::*[1]/self::mo or following-sibling::*[1]/self::mo]"
                 priority="5" mode="mml2tex-preprocess">
   </xsl:template>
@@ -307,7 +310,8 @@
   <!-- render thinspace between numbers and units -->
   
   <xsl:template mode="mml2tex-preprocess" priority="2"
-                match="mspace[xs:decimal(replace(@width, 'em$', '')) le 0.25]
+                match="mspace[@width[matches(., '^[\d.]+em$')]
+                                    [xs:decimal(replace(., 'em$', '')) le 0.25]]
                              [matches(normalize-space(string-join(preceding-sibling::*[1]//text(), '')), '\d$')
                               and matches(normalize-space(string-join(following-sibling::*[1], '')), 
                                           concat('^', $sil-unit-prefixes-regex, '?', $sil-units-regex))]">
