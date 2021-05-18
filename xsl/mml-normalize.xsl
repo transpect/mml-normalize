@@ -15,6 +15,7 @@
   <xsl:import href="function-names.xsl"/>
 
   <xsl:param name="remove-mspace-treshold-em" select="0.16" as="xs:decimal"/>
+  <xsl:param name="remove-mspace-next-to-operator-treshold-em" select="0.25" as="xs:decimal"/>
   <xsl:param name="chars-from-which-to-convert-mi-to-mtext" select="5" as="xs:integer"/>
 
   <xsl:variable name="whitespace-regex" select="'\p{Zs}&#x200b;-&#x200f;'" as="xs:string"/>
@@ -302,7 +303,7 @@
   
   <xsl:template match="mspace[not(@linebreak)]
                              [@width[matches(., '^[\d.]+em$')]
-                                    [xs:decimal(replace(., 'em$', '')) le 0.25]]
+                                    [xs:decimal(replace(., 'em$', '')) le $remove-mspace-next-to-operator-treshold-em]]
                              [preceding-sibling::*[1]/self::mo or following-sibling::*[1]/self::mo]"
                 priority="5" mode="mml2tex-preprocess">
   </xsl:template>
@@ -311,7 +312,7 @@
   
   <xsl:template mode="mml2tex-preprocess" priority="2"
                 match="mspace[@width[matches(., '^[\d.]+em$')]
-                                    [xs:decimal(replace(., 'em$', '')) le 0.25]]
+                                    [xs:decimal(replace(., 'em$', '')) le $remove-mspace-next-to-operator-treshold-em]]
                              [matches(normalize-space(string-join(preceding-sibling::*[1]//text(), '')), '\d$')
                               and matches(normalize-space(string-join(following-sibling::*[1], '')), 
                                           concat('^', $sil-unit-prefixes-regex, '?', $sil-units-regex))]">
