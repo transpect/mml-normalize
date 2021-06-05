@@ -487,6 +487,15 @@
   
   <!-- to-do group mtext in 1st mode and text heurstics in another mode or try matching to mtext/text() -->
   
+  <xsl:variable name="mml2tex:text-char-regex" as="xs:string" 
+                select="concat('[',
+                               '&#x2013;-&#x2014;',
+                               '&#x201c;-&#x201f;',
+                               '&#xc0;-&#xd6;', 
+                               '&#xd9;-&#xf6;',
+                               '&#xf9;-&#x1fd;',
+                               ']')"/>
+  
   <xsl:template match="mtext[not(   matches(., 
                                          concat('^[', $whitespace-regex, ']+$')) 
                                  or processing-instruction())]" 
@@ -496,14 +505,7 @@
       e.g. a legitimate en-dash = - - = would become visible double-minus 
     => keep it as mtext, hopefully becomes \text environment -->
     <xsl:variable name="context" as="element(mtext)" select="."/>
-    <xsl:variable name="text-char-regex" as="xs:string" 
-                  select="concat('[',
-                                 '&#x2013;-&#x2014;',
-                                 '&#x201c;-&#x201f;',
-                                 '&#xc0;-&#xd6;', 
-                                 '&#xd9;-&#xf6;',
-                                 '&#xf9;-&#x1fd;',
-                                 ']')"/>
+    
     <xsl:variable name="current" select="." as="element(mtext)"/>
     <xsl:variable name="parent" select="parent::*" as="element()"/>
     <xsl:variable name="attributes" select="@*" as="attribute()*"/>
@@ -592,7 +594,7 @@
                               <xsl:choose>
                                 <xsl:when test="string-length(normalize-space(.)) lt 4
                                                 and not($current/@xml:space eq 'preserve')
-                                                and not(matches(., $text-char-regex))
+                                                and not(matches(., $mml2tex:text-char-regex))
                                                 ">
                                   <xsl:element name="{mml:gen-name($parent, 'mi')}">
                                     <xsl:attribute name="mathvariant" select="$mathvariant"/>
