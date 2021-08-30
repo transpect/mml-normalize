@@ -125,6 +125,10 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
+  
+  <xsl:template match="mrow[count(*) eq 1][not(@*)]" mode="mml2tex-preprocess">
+    <xsl:apply-templates mode="#current"/>
+  </xsl:template>
     
   <xsl:template match="*[local-name() = ('msub', 'msup')]
                         [empty((*[1]/@*, *[1]/node()))]
