@@ -596,7 +596,7 @@
                             <xsl:non-matching-substring>
                               <!-- map characters to mi -->
                               <xsl:choose>
-                                <xsl:when test="string-length(normalize-space(.)) lt 4
+                                <xsl:when test="string-length(normalize-space(.)) &lt; min((4, $chars-from-which-to-convert-mi-to-mtext))
                                                 and not($current/@xml:space eq 'preserve')
                                                 and not(matches(., $mml2tex:text-char-regex))
                                                 ">
