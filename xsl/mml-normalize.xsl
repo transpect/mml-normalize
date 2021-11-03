@@ -474,6 +474,7 @@
   
   <xsl:template match="mtext[matches(., concat('^[', $whitespace-regex, ']+$'))]
                             [not(parent::*/local-name() = $wrapper-element-names)]
+                            [not(parent::mrow[count(*) eq 1][not(@*)][parent::*/local-name() = $wrapper-element-names])]
                             [preceding::*[1]/ancestor-or-self::*[local-name() = ($non-whitespace-element-names, $non-text-element-names)][not(. = $punctuation-marks)] or
                              following::*[1]/self::*[local-name() = ($non-whitespace-element-names, $non-text-element-names)][not(. = $punctuation-marks)]]" 
                 mode="mml2tex-preprocess" priority="1">
