@@ -347,7 +347,9 @@
   <!-- use no msup for primes to prevent bad scaling -->
   
   <xsl:template match="msup[count(*) eq 2][matches(*[2], '^''+$')]" mode="mml2tex-preprocess">
-    <xsl:apply-templates select="*" mode="#current"/>
+    <mrow xmlns="http://www.w3.org/1998/Math/MathML">
+      <xsl:apply-templates select="*" mode="#current"/>
+    </mrow>
   </xsl:template>
   
   <!-- resolve nested mmultiscripts when authors put tensors in the base of tensors by accident (MS Word equation editor) -->
