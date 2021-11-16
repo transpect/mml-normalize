@@ -492,7 +492,7 @@
     </xsl:element>
   </xsl:template>
   
-  <!-- to-do group mtext in 1st mode and text heurstics in another mode or try matching to mtext/text() -->
+  <!-- to-do group mtext in 1st mode and text heuristics in another mode or try matching to mtext/text() -->
   
   <xsl:variable name="mml2tex:text-char-regex" as="xs:string" 
                 select="concat('[',
