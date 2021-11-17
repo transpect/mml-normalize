@@ -391,6 +391,18 @@
     </xsl:for-each-group>
   </xsl:template>
   
+  <xsl:template match="mtd[1][empty(maligngroup)][exists(../../mtr[mtd/maligngroup])]" mode="mml2tex-preprocess">
+    <!-- Formula after "Die zu berücksichtigende Versicherungssumme" in Y=400_W=BeckOKVAG_G=VAG_P=101_autoKorr_tmp.docx -->
+    <xsl:variable name="max" as="xs:integer" 
+      select="xs:integer(max(for $mtr in ../../mtr return count($mtr/mtd/maligngroup)))"/>
+    <xsl:variable name="cur" as="xs:integer" 
+      select="count(../mtd/maligngroup)"/>
+    <xsl:copy>
+      <xsl:attribute name="columnspan" select="$max - $cur + 1"/>
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+    </xsl:copy>
+  </xsl:template>
+  
   <xsl:template match="mtd/maligngroup | mtd/*[last()][self::mspace][@linebreak= 'newline']" mode="mml2tex-preprocess"/>
 
   <xsl:template match="*[local-name() = ('mo', 'mi', 'mtext', 'mn')]
