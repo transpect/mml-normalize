@@ -172,6 +172,23 @@
       <xsl:attribute name="width" select="mml:replace-literal-mspace(.)"/>
   </xsl:template>
   
+  <xsl:template match="mi[. = '&#x2d7;']" mode="mml2tex-grouping">
+    <!-- Y=400_W=BeckOGK_G=VersAusglG_P=20-1.xml 
+    Sloppy equation editing in Word: The following text was typed in math mode, and they
+    used MODIFIER LETTER MINUS SIGN in order to make the hyphen appear as a hyphen, not
+    as a math mode minus:
+    <m:oMath>
+      <m:r>
+        <m:t>Anteil. Kranken˗ und Pflegeversicherungsbeiträge=</m:t>
+      </m:r>
+    -->
+    <mtext>
+      <!-- apparently U+2011 will be converted to U+2D by another template, but at least
+        it doesn’t stay U+2D7 -->
+      <xsl:text>&#x2011;</xsl:text>
+    </mtext>
+  </xsl:template>
+  
   <xsl:template match="  mo[. = '.']
                            [not(following-sibling::*[1]/self::mo[. = '.'])]
                            [preceding-sibling::*[1]/self::mo[. = '.']]
