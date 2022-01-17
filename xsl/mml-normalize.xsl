@@ -92,49 +92,9 @@
     </xsl:copy>
   </xsl:template>
   
-  <xsl:template match="*[local-name() = ('msub', 'msup')]
-                        [empty((*[1]/@*, *[1]/node()))]
-                        [following-sibling::*[1]
-                                             [local-name() = current()/local-name()]]"
-                mode="mml2tex-grouping">
-    <xsl:variable name="localname" select="local-name()"/>
-    <xsl:variable name="next-non-group-el" select="following-sibling::*[not(local-name() = $localname)][1]/generate-id()"/>
-    <xsl:copy>
-      <xsl:apply-templates select="*[1]" mode="#current"/>
-      <xsl:variable name="_mrow">
-        <mrow>
-          <xsl:apply-templates
-            select="*[2], following-sibling::*[following-sibling::*/generate-id() = $next-non-group-el]/*[2]"
-            mode="#current">
-            <xsl:with-param name="dissolve-mrow" select="true()"/>
-          </xsl:apply-templates>
-        </mrow>
-      </xsl:variable>
-      <xsl:apply-templates select="$_mrow" mode="#current"/>
-    </xsl:copy>
-  </xsl:template>
-    
-  <xsl:template match="mrow" mode="mml2tex-grouping">
-    <xsl:param name="dissolve-mrow" select="false()"/>
-    <xsl:choose>
-      <xsl:when test="$dissolve-mrow">
-        <xsl:apply-templates mode="#current"/>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:next-match/>
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:template>
-  
   <xsl:template match="mrow[count(*) eq 1][not(@*)]" mode="mml2tex-preprocess">
     <xsl:apply-templates mode="#current"/>
   </xsl:template>
-    
-  <xsl:template match="*[local-name() = ('msub', 'msup')]
-                        [empty((*[1]/@*, *[1]/node()))]
-                        [preceding-sibling::*[1]
-                                             [local-name() = current()/local-name()]]" 
-                mode="mml2tex-grouping" priority="2"/>
   
   <!-- conclude three single mo elements with the '.' character to horizontal ellipsis -->
   <xsl:template match="mo[. = '.']
@@ -351,7 +311,7 @@
   <!-- repair msup/msub with more than two child elements. We assume the last node was superscripted/subscripted -->
 
   <xsl:template match="msup[count(*) gt 2]
-		                  |msub[count(*) gt 2]" mode="mml2tex-preprocess">
+		         |msub[count(*) gt 2]" mode="mml2tex-preprocess">
     <xsl:copy>
       <xsl:apply-templates select="@*" mode="#current"/>
       <mrow xmlns="http://www.w3.org/1998/Math/MathML">
