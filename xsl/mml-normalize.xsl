@@ -535,18 +535,32 @@
             </xsl:matching-substring>
             <xsl:non-matching-substring>
               
-              <xsl:analyze-string select="." regex="{concat('(\s', $mi-regex, '\s)|(^\s?', $mi-regex, '\s?$)|(\s', $mi-regex, '$)|(^', $mi-regex, '\s)')}">
+              <xsl:analyze-string select="." regex="{concat('((\s)', $mi-regex, '(\s))|(^(\s?)', $mi-regex, '(\s?)$)|((\s)', $mi-regex, '$)|(^', $mi-regex, '(\s))')}">
                 
                 <!-- tag identifiers -->
                 <xsl:matching-substring>
+                  <xsl:variable name="space-before" as="xs:string"
+                    select="string-join((regex-group(2), regex-group(4), regex-group(6)), '')"/>
+                  <xsl:variable name="space-after" as="xs:string"
+                    select="string-join((regex-group(3), regex-group(5), regex-group(7)), '')"/>
+                  <xsl:if test="string-length($space-before) gt 0">
+                    <xsl:element name="{mml:gen-name($parent, 'mspace')}">
+                      <xsl:attribute name="width" select="'0.222em'"/>
+                    </xsl:element>
+                  </xsl:if>
                   <xsl:element name="{mml:gen-name($parent, 'mi')}">
                     <xsl:attribute name="mathvariant" select="$mathvariant"/>
                     <xsl:apply-templates select="$attributes[not(local-name() eq 'mathvariant')]" mode="#current"/>
                     <xsl:value-of select="normalize-space(.)"/>
                   </xsl:element>
+                  <xsl:if test="string-length($space-after) gt 0">
+                    <xsl:element name="{mml:gen-name($parent, 'mspace')}">
+                      <xsl:attribute name="width" select="'0.222em'"/>
+                    </xsl:element>
+                  </xsl:if>
                 </xsl:matching-substring>
                 <xsl:non-matching-substring>
-                  
+
                   <!-- tag numerical values -->
                   <xsl:analyze-string select="." regex="[0-9]+">
                     
