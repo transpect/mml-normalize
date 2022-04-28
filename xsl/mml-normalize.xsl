@@ -512,8 +512,9 @@
                            @fontweight, 
                            @fontstyle, 
                            'normal')[1]" as="xs:string"/>
-    <xsl:variable name="new-mathml" as="element()*">
+    <xsl:variable name="new-mathml" as="document-node()">
 
+      <xsl:document><!-- document node because we want to use preceding-sibling etc. in mml2tex-postprocess-preprocess -->
       <xsl:analyze-string select="." regex="{$regular-words-regex}">
   
         <!-- preserve hyphenated words -->
@@ -540,12 +541,13 @@
                 <!-- tag identifiers -->
                 <xsl:matching-substring>
                   <xsl:variable name="space-before" as="xs:string"
-                    select="string-join((regex-group(2), regex-group(4), regex-group(6)), '')"/>
+                    select="string-join((regex-group(2), regex-group(9), regex-group(16)), '')"/>
                   <xsl:variable name="space-after" as="xs:string"
-                    select="string-join((regex-group(3), regex-group(5), regex-group(7)), '')"/>
+                    select="string-join((regex-group(7), regex-group(14), regex-group(26)), '')"/>
                   <xsl:if test="string-length($space-before) gt 0">
                     <xsl:element name="{mml:gen-name($parent, 'mspace')}">
-                      <xsl:attribute name="width" select="'0.222em'"/>
+                      <xsl:attribute name="width" select="'0.25em'"/>
+                      <xsl:attribute name="class" select="'keep-only-if-next-to-mtext'"/>
                     </xsl:element>
                   </xsl:if>
                   <xsl:element name="{mml:gen-name($parent, 'mi')}">
@@ -555,7 +557,8 @@
                   </xsl:element>
                   <xsl:if test="string-length($space-after) gt 0">
                     <xsl:element name="{mml:gen-name($parent, 'mspace')}">
-                      <xsl:attribute name="width" select="'0.222em'"/>
+                      <xsl:attribute name="width" select="'0.25em'"/>
+                      <xsl:attribute name="class" select="'keep-only-if-next-to-mtext'"/>
                     </xsl:element>
                   </xsl:if>
                 </xsl:matching-substring>
@@ -632,6 +635,7 @@
           </xsl:analyze-string>
         </xsl:non-matching-substring>
       </xsl:analyze-string>
+      </xsl:document>
     </xsl:variable>
     <xsl:choose>
       <xsl:when test="count($new-mathml) = 0">
@@ -639,15 +643,23 @@
       </xsl:when>
       <xsl:when test="count($new-mathml) gt 1">
         <mrow>
-          <xsl:sequence select="$new-mathml"/>
+          <xsl:apply-templates select="$new-mathml" mode="mml2tex-postprocess-preprocess"/>
         </mrow>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:sequence select="$new-mathml"/>
+        <xsl:apply-templates select="$new-mathml" mode="mml2tex-postprocess-preprocess"/>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
+
+  <xsl:template match="mml:mspace[@class = 'keep-only-if-next-to-mtext']
+                                 [empty(preceding-sibling::*[1]/self::mml:mtext)]
+                                 [empty(following-sibling::*[1]/self::mml:mtext)]" 
+                mode="mml2tex-postprocess-preprocess"/>
   
+  <xsl:template match="mml:mspace/@class[. = 'keep-only-if-next-to-mtext']" 
+                mode="mml2tex-postprocess-preprocess"/>
+
   <xsl:function name="mml:gen-name" as="xs:string">
     <xsl:param name="parent" as="element()"/>
     <xsl:param name="name" as="xs:string"/>
@@ -671,7 +683,7 @@
   
   <!-- identity template -->
   
-  <xsl:template match="*|@*|processing-instruction()" mode="mml2tex-grouping mml2tex-preprocess">
+  <xsl:template match="*|@*|processing-instruction()" mode="mml2tex-grouping mml2tex-preprocess mml2tex-postprocess-preprocess">
     <xsl:copy>
       <xsl:apply-templates select="@*|node()|processing-instruction()" mode="#current"/>
     </xsl:copy>
