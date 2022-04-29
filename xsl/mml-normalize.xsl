@@ -638,10 +638,10 @@
       </xsl:document>
     </xsl:variable>
     <xsl:choose>
-      <xsl:when test="count($new-mathml) = 0">
+      <xsl:when test="count($new-mathml/*) = 0">
         <xsl:message terminate="yes" select="'Unexpected empty result from ', $context, ' (not totally unexpected: it can happen for empty mtext elements)'"/>
       </xsl:when>
-      <xsl:when test="count($new-mathml) gt 1">
+      <xsl:when test="count($new-mathml/*) gt 1">
         <mrow>
           <xsl:apply-templates select="$new-mathml" mode="mml2tex-postprocess-preprocess"/>
         </mrow>
