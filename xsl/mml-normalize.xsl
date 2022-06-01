@@ -381,6 +381,38 @@
   </xsl:template>
   
   <xsl:template match="mtd/maligngroup | mtd/*[last()][self::mspace][@linebreak= 'newline']" mode="mml2tex-preprocess"/>
+  
+  <!-- convert poorly drawn lines to proper @rowline declaration -->
+  
+  <xsl:template match="mtable[mtr[matches(replace(., '\s', ''), '^[\.]+$')]
+                                 [count(.//*) gt 5]]" mode="mml2tex-preprocess">
+    <xsl:variable name="row-indexes-with-poorly-drawn-lines" as="xs:integer*" 
+                  select="mtr[matches(replace(., '\s', ''), '^[\.]+$')]
+                             [count(.//*) gt 5]/(count(preceding-sibling::mtr)+1)"/>
+    <xsl:variable name="rowlines" as="xs:string*" 
+                  select="tokenize(@rowlines, '\s')"/>
+    <xsl:copy>
+      <xsl:attribute name="rowlines" 
+                     select="for $i in (1 to count(mtr))
+                             return ('dashed'[$i = $row-indexes-with-poorly-drawn-lines], $rowlines[$i], 'none')[1]"/>
+      <xsl:attribute name="mml2tex:rowlines" 
+                             select="for $i in (1 to count(mtr))
+                             return ('dotted'[$i = $row-indexes-with-poorly-drawn-lines], $rowlines[$i], 'none')[1]"/>
+      <xsl:for-each select="mtr">
+        <xsl:copy>
+          <xsl:apply-templates select="@*" mode="#current"/>
+          <xsl:choose>
+            <xsl:when test="position() = $row-indexes-with-poorly-drawn-lines">
+              <mtd class="mml-normalize:removed"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:apply-templates select="@*, node()" mode="#current"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:copy>  
+      </xsl:for-each>
+    </xsl:copy>
+  </xsl:template>
 
   <xsl:template match="*[local-name() = ('mo', 'mi', 'mtext', 'mn')]
                         [matches(., concat('^', $mml2tex:functions-names-regex, '\d+([,\.]\d+)*$'))]" mode="mml2tex-preprocess">
