@@ -131,6 +131,10 @@
   <xsl:template match="mspace[matches(@width, '^[a-z]+$')]/@width" mode="mml2tex-grouping">
       <xsl:attribute name="width" select="mml:replace-literal-mspace(.)"/>
   </xsl:template>
+
+  <xsl:template match="mover[@accent = 'true'][count(*) = 2]/*[2][self::mi[not(@mathvariant)][. = ('˜', '~')]]" mode="mml2tex-grouping">
+    <mo>̃</mo>
+  </xsl:template>
   
   <xsl:template match="mi[. = '&#x2d7;']" mode="mml2tex-grouping">
     <!-- Y=400_W=BeckOGK_G=VersAusglG_P=20-1.xml 
