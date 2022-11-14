@@ -91,6 +91,24 @@
       
     </xsl:copy>
   </xsl:template>
+
+  <!-- handle splitted mtext in mrow, example: <mrow>
+         <mtext>„</mtext><mtext>neoklassischer Wicksell-Effekt</mtext><mtext>“</mtext>
+       </mrow> -->
+  <xsl:template match="mrow[count(*) gt 1]
+                           [every $e in * 
+                            satisfies $e[
+                              self::mtext[
+                                string-join(('_', for $a in @* return (name($a), $a)), '')
+                                =
+                                string-join(('_', for $a in parent::mrow/mtext[1]/@* return (name($a), $a)), '')
+                              ]
+                            ]
+                           ]" mode="mml2tex-grouping" priority="3">
+    <mtext>
+      <xsl:apply-templates select="*[1]/@*, */node()" mode="#current"/>
+    </mtext>
+  </xsl:template>
   
   <xsl:template match="mrow[count(*) eq 1][not(@*)]" mode="mml2tex-preprocess">
     <xsl:apply-templates mode="#current"/>
