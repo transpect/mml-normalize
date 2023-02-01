@@ -309,7 +309,8 @@
   <xsl:template match="mspace[not(@linebreak)]
                              [@width[matches(., '^[\d.]+em$')]
                                     [xs:decimal(replace(., 'em$', '')) le $remove-mspace-treshold-em]]
-                             [not(preceding-sibling::*[1]/self::mtext or following-sibling::*[1]/self::mtext)]"
+                             [not(preceding-sibling::*[1]/self::mtext or following-sibling::*[1]/self::mtext)]
+                             [not(parent::mtd and count(parent::*/*) = 1)]"
                 mode="mml2tex-preprocess">
     <xsl:text>&#x20;</xsl:text>
   </xsl:template>
@@ -319,7 +320,8 @@
   <xsl:template match="mspace[not(@linebreak)]
                              [@width[matches(., '^[\d.]+em$')]
                                     [xs:decimal(replace(., 'em$', '')) le $remove-mspace-next-to-operator-treshold-em]]
-                             [preceding-sibling::*[1]/self::mo or following-sibling::*[1]/self::mo]"
+                             [preceding-sibling::*[1]/self::mo or following-sibling::*[1]/self::mo]
+                             [not(parent::mtd and count(parent::*/*) = 1)]"
                 priority="5" mode="mml2tex-preprocess">
   </xsl:template>
   
