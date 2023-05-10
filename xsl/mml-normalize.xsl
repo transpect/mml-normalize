@@ -13,6 +13,7 @@
   
   <xsl:import href="operators.xsl"/>
   <xsl:import href="function-names.xsl"/>
+  <xsl:import href="tidy-up-simple.xsl"/>
 
   <xsl:param name="remove-mspace-treshold-em" select="0.16" as="xs:decimal"/>
   <xsl:param name="remove-mspace-next-to-operator-treshold-em" select="0.25" as="xs:decimal"/>
