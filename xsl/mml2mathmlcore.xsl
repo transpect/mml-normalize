@@ -23,16 +23,16 @@
   <xsl:template match="mfenced" mode="mml-to-core">
     <xsl:variable name="context" select="." as="element(mfenced)"/>
     <mrow>
-      <mo>
-        <xsl:choose>
-          <xsl:when test="exists(@open)">
-            <xsl:apply-templates select="@open" mode="#current"/>
-          </xsl:when>
-          <xsl:otherwise>
+      <xsl:choose>
+        <xsl:when test="exists(@open)">
+          <xsl:apply-templates select="@open" mode="#current"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <mo>
             <xsl:value-of select="'('"/>
-          </xsl:otherwise>
-        </xsl:choose>
-      </mo>
+          </mo>
+        </xsl:otherwise>
+      </xsl:choose>
       <xsl:choose>
         <xsl:when test="count(*) = 1">
           <xsl:apply-templates mode="#current"/>
@@ -54,16 +54,16 @@
           </mrow>
         </xsl:otherwise>
       </xsl:choose>
-      <mo>
-        <xsl:choose>
-          <xsl:when test="exists(@close)">
-            <xsl:apply-templates select="@close" mode="#current"/>
-          </xsl:when>
-          <xsl:otherwise>
+      <xsl:choose>
+        <xsl:when test="exists(@close)">
+          <xsl:apply-templates select="@close" mode="#current"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <mo>
             <xsl:value-of select="')'"/>
-          </xsl:otherwise>
-        </xsl:choose>
-      </mo>
+          </mo>
+        </xsl:otherwise>
+      </xsl:choose>
     </mrow>
   </xsl:template>
   
