@@ -28,7 +28,7 @@
           <xsl:apply-templates select="@open" mode="#current"/>
         </xsl:when>
         <xsl:otherwise>
-          <mo>
+          <mo stretchy="true">
             <xsl:value-of select="'('"/>
           </mo>
         </xsl:otherwise>
@@ -45,7 +45,7 @@
               <xsl:variable name="separators" 
                 select="for $i in (1 to string-length($context/@separators/normalize-space())) 
                         return substring($context/@separators/normalize-space(), $i, 1)"/>
-              <xsl:if test="position() != last()">
+              <xsl:if test="position() != last() and ($context/@separators!='') ">
                 <mo>
                   <xsl:value-of select="($separators[$pos], $separators[last()], ',')[1]"/>
                 </mo>
@@ -59,7 +59,7 @@
           <xsl:apply-templates select="@close" mode="#current"/>
         </xsl:when>
         <xsl:otherwise>
-          <mo>
+          <mo stretchy="true">
             <xsl:value-of select="')'"/>
           </mo>
         </xsl:otherwise>
@@ -68,7 +68,7 @@
   </xsl:template>
   
   <xsl:template match="mfenced/@open | mfenced/@close" mode="mml-to-core">
-    <mo>
+    <mo stretchy="true">
       <xsl:value-of select="."/>
     </mo>
   </xsl:template>
