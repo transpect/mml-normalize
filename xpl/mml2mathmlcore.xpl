@@ -21,10 +21,21 @@
 
   <p:option name="to-version" select="'4-core'"/>
   <p:option name="from-version" select="'any'"/>
+  <p:option name="keep-mml-prefix" select="'any'">
+    <p:documentation>Keep and add mml-prefix (all) or dissolve prefix (none)</p:documentation>
+  </p:option>
 
   <p:xslt initial-mode="mml-to-core">
     <p:with-param name="to-version" select="$to-version"/>
     <p:with-param name="from-version" select="$from-version"/>
+    <p:input port="stylesheet">
+      <p:pipe port="stylesheet" step="mml2mathmlcore"/>
+    </p:input>
+    <p:input port="parameters"><p:empty/></p:input>
+  </p:xslt>
+  
+  <p:xslt initial-mode="mml-prefix">
+    <p:with-param name="keep-mml-prefix" select="$keep-mml-prefix"/>
     <p:input port="stylesheet">
       <p:pipe port="stylesheet" step="mml2mathmlcore"/>
     </p:input>

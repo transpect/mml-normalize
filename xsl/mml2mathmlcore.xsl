@@ -3,7 +3,7 @@
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
   xmlns:mml="http://www.w3.org/1998/Math/MathML"
   xmlns="http://www.w3.org/1998/Math/MathML"
-  version="2.0"
+  version="2.0" 
   exclude-result-prefixes="#all" 
   xpath-default-namespace="http://www.w3.org/1998/Math/MathML">
   <!--  *
@@ -18,6 +18,8 @@
   
   <xsl:param name="to-version" select="'4-core'"/>
   <xsl:param name="from-version" select="'any'"/>
+  <xsl:param name="keep-mml-prefix" select="'any'"/>
+  <!-- (all|none) keep mml prefix or dissolve all  -->
   
   <!-- dissolve mfenced to mrow --> 
   <xsl:template match="mfenced" mode="mml-to-core">
@@ -74,11 +76,22 @@
   </xsl:template>
   
   <!-- identity template -->
-  <xsl:template match="node() | @*" mode="mml-to-core" priority="-1">
-    <xsl:copy copy-namespaces="no">
-      <xsl:apply-templates select="@*" mode="#current"/>
-      <xsl:apply-templates select="node()" mode="#current"/>
+  <xsl:template match="@* | node()"  mode="mml-to-core mml-prefix">
+    <xsl:copy>
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
     </xsl:copy>
+  </xsl:template>
+  
+  <xsl:template match="*[namespace-uri()='http://www.w3.org/1998/Math/MathML'][$keep-mml-prefix='all']"  mode="mml-prefix">
+    <xsl:element name="mml:{local-name()}">
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+    </xsl:element>
+  </xsl:template>
+  
+  <xsl:template match="*[matches(name(.),'^mml:')][$keep-mml-prefix='none']"  mode="mml-prefix">
+    <xsl:element name="{local-name()}">
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+    </xsl:element>
   </xsl:template>
   
 </xsl:stylesheet>
