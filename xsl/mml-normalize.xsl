@@ -185,9 +185,9 @@
   
   <!-- resolve empty mi, mn, mo -->
   
-  <xsl:template match="mi[not(normalize-space(.)) and not(processing-instruction())]
-                      |mo[not(normalize-space(.)) and not(processing-instruction())]
-                      |mn[not(normalize-space(.)) and not(processing-instruction())]" mode="mml2tex-preprocess"/>
+  <xsl:template match="*[name() = ('mi', 'mn', 'mo')]
+                        [(not(normalize-space(.)) or matches(., concat('^[', $whitespace-regex, ']+$'))) 
+                         and not(processing-instruction())]" mode="mml2tex-preprocess"/>
   
   <!-- resolve msubsup if superscript and subscript is empty -->
   
@@ -307,14 +307,21 @@
   
   <!-- dissolve mspace less equal than mspace treshold -->
   
-  <xsl:template match="mspace[not(@linebreak)]
-                             [@width[matches(., '^[\d.]+em$')]
-                                    [xs:decimal(replace(., 'em$', '')) le $remove-mspace-treshold-em]]
-                             [not(preceding-sibling::*[1]/self::mtext or following-sibling::*[1]/self::mtext)]
-                             [not(parent::mtd and count(parent::*/*) = 1)]"
+  <xsl:template match="mspace[mml:remove-mspace-treshold-em_candidate(.)]"
                 mode="mml2tex-preprocess">
     <xsl:text>&#x20;</xsl:text>
   </xsl:template>
+  
+  <xsl:function name="mml:remove-mspace-treshold-em_candidate" as="xs:boolean">
+    <xsl:param name="mspace-element" as="element()"/>
+    <xsl:sequence select="exists(
+                            $mspace-element[not(@linebreak)]
+                                           [@width[matches(., '^[\d.]+em$')]
+                                                  [xs:decimal(replace(., 'em$', '')) le $remove-mspace-treshold-em]]
+                                           [not(preceding-sibling::*[1]/self::mtext or following-sibling::*[1]/self::mtext)]
+                                           [not(parent::mtd and count(parent::*/*) = 1)]
+                          )"/>
+  </xsl:function>
   
   <!-- remove space preceded or followed by operators-->
   
