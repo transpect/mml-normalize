@@ -307,7 +307,8 @@
   
   <!-- dissolve mspace less equal than mspace treshold -->
   
-  <xsl:template match="mspace[mml:remove-mspace-treshold-em_candidate(.)]"
+  <xsl:template match="mspace[mml:remove-mspace-treshold-em_candidate(.)]
+                             [not(parent::*/local-name() = $wrapper-element-names)]"
                 mode="mml2tex-preprocess">
     <xsl:text>&#x20;</xsl:text>
   </xsl:template>
