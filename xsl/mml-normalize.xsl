@@ -313,6 +313,13 @@
     <xsl:text>&#x20;</xsl:text>
   </xsl:template>
   
+  <xsl:template match="munderover[*[3][self::mspace[mml:remove-mspace-treshold-em_candidate(.)]]]"
+                mode="mml2tex-preprocess">
+    <munder xmlns="http://www.w3.org/1998/Math/MathML">
+      <xsl:apply-templates select="@*, node() except *[3]" mode="#current"/>
+    </munder>
+  </xsl:template>
+  
   <xsl:function name="mml:remove-mspace-treshold-em_candidate" as="xs:boolean">
     <xsl:param name="mspace-element" as="element()"/>
     <xsl:sequence select="exists(
