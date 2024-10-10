@@ -14,4 +14,8 @@
     <xsl:apply-templates mode="#current"/>
   </xsl:template>
   
+  <xsl:variable name="dissolve-only-whitespace-math-threshold" select="1" as="xs:double"/>
+  <xsl:template match="math[every $el in * satisfies $el[self::mspace]]
+                            [sum(xs:double(*:mspace/@width/replace(.,'[a-z]+',''))) lt $dissolve-only-whitespace-math-threshold]" mode="mml2tex-preprocess"/>
+  
 </xsl:stylesheet>
