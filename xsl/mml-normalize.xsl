@@ -758,11 +758,16 @@
   <xsl:variable name="accent-regex" select="'^[&#x60;&#xA8;&#xB4;&#xb8;&#x2c6;&#x2c7;&#x2d8;-&#x2dd;&#x300;-&#x338;&#x20d0;-&#x20ef;]$'" as="xs:string"/>
   
   <!-- Always put an accent that is in a non-mi element or whose element is wrapped in mstyle into an mi: --> 
-  <xsl:template match="*[empty(self::mi | self::mstyle)][empty(*)][matches(., $accent-regex)]
+  <xsl:template match="*[empty(self::mi | self::mstyle)][empty(*)][ancestor::math][matches(., $accent-regex)]
                       |mstyle[count(*) eq 1 and *[empty(*)][matches(., $accent-regex)]]" mode="mml2tex-preprocess" priority="20">
     <mi>
-      <xsl:apply-templates select="(self::mstyle/* | self::*[empty(self::mstyle)])/(@* | node())" mode="#current"></xsl:apply-templates>
+      <xsl:apply-templates select="(self::mstyle/* | self::*[empty(self::mstyle)])/(@* | node())" mode="#current"/>
     </mi>
+  </xsl:template>
+  
+  <!-- normalize primes in mi -->
+  <xsl:template match="mi[matches(.,'&#xB4;')]/text()" mode="mml2tex-preprocess" priority="20">
+    <xsl:sequence select="replace(.,'&#xB4;','&#x2032;')"/>
   </xsl:template>
   
   <!-- identity template -->
