@@ -305,6 +305,30 @@
     <xsl:apply-templates select="*[1]" mode="#current"/>
   </xsl:template>
   
+  <!-- fix msub/msub where base is an mspace -->
+  
+  <xsl:template match="*[local-name() = ('msub', 'msup')]
+                        [*[1][self::mspace]]" mode="mml2tex-preprocess">
+    <xsl:copy>
+      <xsl:apply-templates select="@*" mode="#current"/>
+      <xsl:apply-templates select="preceding-sibling::*[1]" mode="move-into-msub-or-msup"/>
+      <xsl:apply-templates select="*[2]" mode="#current"/>
+    </xsl:copy>
+  </xsl:template>
+  
+  <xsl:template match="*[local-name() = ('msub', 'msup')]
+                        [*[1][self::mspace]]/*[1]
+                      |*[following-sibling::*[local-name() = ('msub', 'msup')]
+                        [*[1][self::mspace]]]" mode="mml2tex-preprocess"/>
+  
+  
+  <xsl:template match="*[following-sibling::*[local-name() = ('msub', 'msup')]
+                                             [*[1][self::mspace]]]" mode="move-into-msub-or-msup">
+    <xsl:copy>
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+    </xsl:copy>
+  </xsl:template>
+  
   <!-- dissolve mspace less equal than mspace treshold -->
   
   <xsl:template match="mspace[mml:remove-mspace-treshold-em_candidate(.)]
