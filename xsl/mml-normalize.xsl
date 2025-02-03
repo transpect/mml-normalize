@@ -307,7 +307,7 @@
   </xsl:template>
   
   <!-- https://mantis.le-tex.de/view.php?id=37994
-       fix msub/msup where base is a space -->
+       fix msub/msub where base is an mspace -->
   
   <xsl:template match="*[local-name() = ('msub', 'msup')]
                         [*[1][self::mspace or self::mrow[count(*) = 1][mspace]]]" mode="mml2tex-preprocess">
@@ -320,8 +320,9 @@
   
   <xsl:template match="*[local-name() = ('msub', 'msup')]
                         [*[1][self::mspace or self::mrow[count(*) = 1][mspace]]]/*[1]
-                      |*[following-sibling::*[local-name() = ('msub', 'msup')]
-                        [*[1][self::mspace or self::mrow[count(*) = 1][mspace]]]]" mode="mml2tex-preprocess"/>
+                      |*[following-sibling::msup
+                        [*[1][self::mspace or self::mrow[count(*) = 1][mspace]]]
+                        [not(*[2] = $superscript-looking-chars)]]" mode="mml2tex-preprocess"/>
   
   
   <xsl:template match="*[following-sibling::*[local-name() = ('msub', 'msup')]
@@ -330,7 +331,17 @@
       <xsl:apply-templates select="@*, node()" mode="#current"/>
     </xsl:copy>
   </xsl:template>
-    
+  
+  <!-- https://mantis.le-tex.de/view.php?id=37994
+       resolve msup with characters that look like a superscript, e.g. degree character -->
+  
+  <xsl:variable name="superscript-looking-chars" as="xs:string+" 
+                select="'&#x22;', '''', '&#x5e;', '&#x60;', '&#xb0;'"/>
+  
+  <xsl:template match="msup[*[2][. = $superscript-looking-chars]]" mode="mml2tex-preprocess" priority="5">
+    <xsl:apply-templates mode="#current"/>
+  </xsl:template>
+  
   <!-- dissolve mspace less equal than mspace treshold -->
   
   <xsl:template match="mspace[mml:remove-mspace-treshold-em_candidate(.)]
