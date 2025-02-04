@@ -325,10 +325,9 @@
                         [not(*[2] = $superscript-looking-chars)]]" mode="mml2tex-preprocess"/>
   
   
-  <xsl:template match="*[following-sibling::*[local-name() = ('msub', 'msup')]
-                        [*[1][self::mspace or self::mrow[count(*) = 1][mspace]]]]" mode="move-into-msub-or-msup">
+  <xsl:template match="*" mode="move-into-msub-or-msup">
     <xsl:copy>
-      <xsl:apply-templates select="@*, node()" mode="#current"/>
+      <xsl:apply-templates select="@*, node()" mode="mml2tex-preprocess"/>
     </xsl:copy>
   </xsl:template>
   
@@ -336,11 +335,25 @@
        resolve msup with characters that look like a superscript, e.g. degree character -->
   
   <xsl:variable name="superscript-looking-chars" as="xs:string+" 
-                select="'&#x22;', '''', '&#x5e;', '&#x60;', '&#xb0;', '&#xb2;', '&#xb3;', '&#xb9;', '&#x2070;', '&#x2071;', '&#x2074;', '&#x2075;', '&#x2076;', '&#x2077;', '&#x2078;', '&#x2079;', '&#x207a;', '&#x207b;', '&#x207c;', '&#x207d;', '&#x207e;', '&#x207f;'"/>
+                select="'&#x22;', '''', '&#x5e;', '&#x60;', '&#xb0;',  '&#x207a;', '&#x207b;', '&#x207c;', '&#x207d;', '&#x207e;', '&#x207f;'"/>
   
   <xsl:template match="msup[*[2][. = $superscript-looking-chars]]" mode="mml2tex-preprocess" priority="5">
     <xsl:apply-templates mode="#current"/>
   </xsl:template>
+  
+  <xsl:variable name="superscript-digits" as="xs:string+" 
+                select="'&#xb2;', '&#xb3;', '&#xb9;', '&#x2070;', '&#x2071;', '&#x2074;', '&#x2075;', '&#x2076;', '&#x2077;', '&#x2078;', '&#x2079;'"/>
+  
+  <xsl:template match="mo[. = $superscript-digits][preceding-sibling::*[1]]" mode="mml2tex-preprocess">
+    <msup>
+      <xsl:apply-templates select="preceding-sibling::*[1]" mode="move-into-msub-or-msup"/>  
+      <mn>
+        <xsl:value-of select="translate(., string-join($superscript-digits, ''), '2310123456789')"/>
+      </mn>
+    </msup>
+  </xsl:template>
+  
+  <xsl:template match="*[following-sibling::*[1][self::mo[. = $superscript-digits]]]" mode="mml2tex-preprocess" priority="15"/>
   
   <!-- dissolve mspace less equal than mspace treshold -->
   
@@ -622,7 +635,6 @@
       e.g. a legitimate en-dash = - - = would become visible double-minus 
     => keep it as mtext, hopefully becomes \text environment -->
     <xsl:variable name="context" as="element(mtext)" select="."/>
-    
     <xsl:variable name="current" select="." as="element(mtext)"/>
     <xsl:variable name="parent" select="parent::*" as="element()"/>
     <xsl:variable name="attributes" select="@*" as="attribute()*"/>
