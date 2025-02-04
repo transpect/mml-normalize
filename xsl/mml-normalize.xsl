@@ -341,14 +341,16 @@
     <xsl:apply-templates mode="#current"/>
   </xsl:template>
   
+  <!-- https://mantis.le-tex.de/view.php?id=35298 -->
+  
   <xsl:variable name="superscript-digits" as="xs:string+" 
-                select="'&#xb2;', '&#xb3;', '&#xb9;', '&#x2070;', '&#x2071;', '&#x2074;', '&#x2075;', '&#x2076;', '&#x2077;', '&#x2078;', '&#x2079;'"/>
+                select="'&#xb2;', '&#xb3;', '&#xb9;', '&#x2070;', '&#x2074;', '&#x2075;', '&#x2076;', '&#x2077;', '&#x2078;', '&#x2079;'"/>
   
   <xsl:template match="mo[. = $superscript-digits][preceding-sibling::*[1]]" mode="mml2tex-preprocess">
     <msup>
       <xsl:apply-templates select="preceding-sibling::*[1]" mode="move-into-msub-or-msup"/>  
       <mn>
-        <xsl:value-of select="translate(., string-join($superscript-digits, ''), '2310123456789')"/>
+        <xsl:value-of select="translate(., string-join($superscript-digits, ''), '2310456789')"/>
       </mn>
     </msup>
   </xsl:template>
