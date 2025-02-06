@@ -338,7 +338,9 @@
                 select="'&#x22;', '''', '&#x5e;', '&#x60;', '&#xb0;',  '&#x207a;', '&#x207b;', '&#x207c;', '&#x207d;', '&#x207e;', '&#x207f;'"/>
   
   <xsl:template match="msup[*[2][. = $superscript-looking-chars]]" mode="mml2tex-preprocess" priority="5">
-    <xsl:apply-templates mode="#current"/>
+    <mrow>
+      <xsl:apply-templates mode="#current"/>
+    </mrow>
   </xsl:template>
   
   <!-- https://mantis.le-tex.de/view.php?id=35298 -->
