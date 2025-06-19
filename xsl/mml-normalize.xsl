@@ -111,8 +111,8 @@
     </mtext>
   </xsl:template>
   
-  <xsl:template match="mrow[count(*) eq 1][not(@*)]" mode="mml2tex-preprocess">
-    <xsl:apply-templates mode="#current"/>
+  <xsl:template match="mrow[count(*) eq 1][not(@*)][not(mmultiscripts[mrow/mmultiscripts])]" mode="mml2tex-preprocess">
+    <xsl:apply-templates mode="#current"/>  
   </xsl:template>
   
   <!-- conclude three single mo elements with the '.' character to horizontal ellipsis -->
@@ -392,8 +392,7 @@
                                     [xs:decimal(replace(., 'em$', '')) le $remove-mspace-next-to-operator-treshold-em]]
                              [preceding-sibling::*[1]/self::mo or following-sibling::*[1]/self::mo]
                              [not(parent::mtd and count(parent::*/*) = 1)]"
-                priority="5" mode="mml2tex-preprocess">
-  </xsl:template>
+                priority="5" mode="mml2tex-preprocess"/>
   
   <!-- render thinspace between numbers and units -->
   
@@ -650,7 +649,6 @@
                            @fontstyle, 
                            'normal')[1]" as="xs:string"/>
     <xsl:variable name="new-mathml" as="document-node()">
-
       <xsl:document><!-- document node because we want to use preceding-sibling etc. in mml2tex-postprocess-preprocess -->
       <xsl:analyze-string select="." regex="{$regular-words-regex}">
   
