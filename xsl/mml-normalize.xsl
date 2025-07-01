@@ -391,7 +391,8 @@
                              [@width[matches(., '^[\d.]+em$')]
                                     [xs:decimal(replace(., 'em$', '')) le $remove-mspace-next-to-operator-treshold-em]]
                              [preceding-sibling::*[1]/self::mo or following-sibling::*[1]/self::mo]
-                             [not(parent::mtd and count(parent::*/*) = 1)]"
+                             [not(parent::mtd and count(parent::*/*) = 1)]
+                             [not(parent::*:mover[every $el in * satisfies $el[self::*:mspace or self::*:mo[@stretchy='true']]])]"
                 priority="5" mode="mml2tex-preprocess"/>
   
   <!-- render thinspace between numbers and units -->
@@ -411,6 +412,18 @@
                         [matches(normalize-space(string-join(preceding-sibling::*[1]//text(), '')), '\d$')
                          and matches(normalize-space(string-join(following-sibling::*[1], '')), concat('^', $sil-unit-prefixes-regex, '?', $sil-units-regex))]" mode="mml2tex-preprocess" priority="2">
     <mspace width="0.16em"/>
+  </xsl:template>
+  
+  <!--  convert stretchy mo over mspace to mo -->
+  
+  <xsl:template match="mover[every $el in * 
+                             satisfies $el[self::mspace[@width[matches(., '^[\d.]+em$')]
+                                                        [xs:decimal(replace(., 'em$', '')) le $remove-mspace-next-to-operator-treshold-em]] 
+                                           or self::*:mo[@stretchy='true']]]"
+                priority="5" mode="mml2tex-preprocess">
+    <mo xmlns="http://www.w3.org/1998/Math/MathML">
+      <xsl:apply-templates select="mo/node()" mode="#current"/>
+    </mo>
   </xsl:template>
 
   <!-- repair msup/msub with more than two child elements. We assume the last node was superscripted/subscripted -->
