@@ -22,13 +22,13 @@
     
   <p:output port="result">
     <p:documentation>
-      The input document but with @alttext attributes for equations
+      The input document with @alttext attributes added
     </p:documentation>
   </p:output>
 
   <p:option name="lang" select="'en'"/>
   <p:option name="sre-path" select="'/home/wbdvadmin/node_modules/speech-rule-engine/bin/sre'"/>
-
+  
   <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
   <p:import href="http://transpect.io/xproc-util/file-uri/xpl/file-uri.xpl"/>
   
@@ -59,27 +59,40 @@
       <p:variable name="args" select="concat('-c ', $lang)"/>
       
       <cx:message>
-        <p:with-option name="message" select="concat('[info]: ', $run, ' ', $args)"/>
+        <p:with-option name="message" select="concat('[info]: run SRE: ', $run, ' ', $args)"/>
       </cx:message>
       
       <!-- the equation is passed to stdin -->
       
-      <p:exec result-is-xml="false" errors-is-xml="false" wrap-result-lines="true" name="get-alttext">
-        <p:input port="source">
-          <p:pipe port="current" step="math-view"/>
-        </p:input>
-        <p:with-option name="command" select="$run"/>
-        <p:with-option name="args" select="$args"/>
-      </p:exec>
-      
-      <p:add-attribute match="mml:math" attribute-name="alttext">
-        <p:input port="source">
-          <p:pipe port="current" step="math-view"/>
-        </p:input>
-        <p:with-option name="attribute-value" select="normalize-space(/c:result/c:line)">
-          <p:pipe port="result" step="get-alttext"/>
-        </p:with-option>
-      </p:add-attribute>
+      <p:try>
+        <p:group>
+          <p:exec result-is-xml="false" errors-is-xml="false" wrap-result-lines="true" name="get-alttext">
+            <p:input port="source">
+              <p:pipe port="current" step="math-view"/>
+            </p:input>
+            <p:with-option name="command" select="$run"/>
+            <p:with-option name="args" select="$args"/>
+          </p:exec>
+          
+          <p:add-attribute match="mml:math" attribute-name="alttext">
+            <p:input port="source">
+              <p:pipe port="current" step="math-view"/>
+            </p:input>
+            <p:with-option name="attribute-value" select="normalize-space(/c:result/c:line)">
+              <p:pipe port="result" step="get-alttext"/>
+            </p:with-option>
+          </p:add-attribute>
+        </p:group>
+        <p:catch>
+          
+          <p:add-attribute match="mml:math" attribute-name="tr:alttext" attribute-value="failed">
+            <p:input port="source">
+              <p:pipe port="current" step="math-view"/>
+            </p:input>
+          </p:add-attribute>          
+          
+        </p:catch>
+      </p:try>
       
     </p:viewport>
     
