@@ -834,6 +834,13 @@
     <xsl:sequence select="replace(.,'&#xB4;','&#x2032;')"/>
   </xsl:template>
   
+  <!-- mroot without index to msqrt -->
+  <xsl:template match="mroot[count(*)=1][not(text()[normalize-space()])]" mode="mml2tex-preprocess">
+    <msqrt>
+      <xsl:apply-templates select="@* | node()" mode="#current"/>
+    </msqrt>
+  </xsl:template>
+  
   <!-- identity template -->
   
   <xsl:template match="*|@*|processing-instruction()" mode="mml2tex-grouping mml2tex-preprocess mml2tex-postprocess-preprocess">
