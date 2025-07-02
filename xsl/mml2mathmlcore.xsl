@@ -30,7 +30,10 @@
           <xsl:apply-templates select="@open" mode="#current"/>
         </xsl:when>
         <xsl:otherwise>
-          <mo stretchy="true">
+          <mo>
+            <xsl:if test="descendant::*/local-name() = ('mfrac','mover','mroot','msqrt','munder','munderover')">
+              <xsl:attribute name="stretchy" select="'true'"/>
+            </xsl:if>
             <xsl:value-of select="'('"/>
           </mo>
         </xsl:otherwise>
@@ -61,7 +64,10 @@
           <xsl:apply-templates select="@close" mode="#current"/>
         </xsl:when>
         <xsl:otherwise>
-          <mo stretchy="true">
+          <mo>
+            <xsl:if test="descendant::*/local-name() = ('mfrac','mover','mroot','msqrt','munder','munderover')">
+              <xsl:attribute name="stretchy" select="'true'"/>
+            </xsl:if>
             <xsl:value-of select="')'"/>
           </mo>
         </xsl:otherwise>
