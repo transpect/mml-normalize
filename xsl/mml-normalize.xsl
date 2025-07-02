@@ -32,6 +32,7 @@
   <xsl:variable name="sil-units-regex" select="'(m|g|s|A|K|mol|cd|rad|sr|GHz|Hz|N|Nm|Pa|J|W|C|V|F|Ω|S|Wb|T|H|°|°C|lm|lx|Bq|Gy|Sv|kat)'" as="xs:string"/>
   <xsl:variable name="sil-unit-prefixes-regex" select="'(G|M|k|d|c|m|µ|n|p|f)'" as="xs:string"/>
   <xsl:variable name="greek-chars-regex" select="'[&#x393;-&#x3f5;]'" as="xs:string"/>
+  <xsl:variable name="parenthesis-regex" select="'[\[\]\(\){}&#x2308;&#x2309;&#x230a;&#x230b;&#x2329;&#x232a;&#x27e6;-&#x27ef;&#x3008;-&#x3011;&#x3014;-&#x301b;\&#x7c;]'" as="xs:string"/>
   
   <xsl:template match="mml:math[every $i in .//mml:* 
                                 satisfies (string-length(normalize-space($i)) eq 0 and not($i/@*))]
@@ -790,7 +791,7 @@
       <xsl:when test="count($new-mathml/*) = 0 and (node() or not(parent::*:math and not(following-sibling::*)))">
         <xsl:message terminate="yes" select="'Unexpected empty result from ', $context, ' (not totally unexpected: it can happen for empty mtext elements)'"/>
       </xsl:when>
-      <xsl:when test="count($new-mathml/*) gt 1">
+      <xsl:when test="count($new-mathml/*) gt 1 and not($new-mathml/*:mo[matches(.,$parenthesis-regex)])">
         <mrow>
           <xsl:apply-templates select="$new-mathml" mode="mml2tex-postprocess-preprocess"/>
         </mrow>
