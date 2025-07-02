@@ -222,6 +222,7 @@
   
   <xsl:template match="*[local-name() = ('mover', 'munder')]
                         [*[2]/self::mspace 
+                        or *[2][local-name()=('mn','mo','mi','mtext')][not(node())]
                         or matches(*[2], concat('^[', $whitespace-regex, ']+$'))]" mode="mml2tex-preprocess">
     <xsl:apply-templates select="*[1]" mode="#current"/>
   </xsl:template>
@@ -798,6 +799,13 @@
         <xsl:apply-templates select="$new-mathml" mode="mml2tex-postprocess-preprocess"/>
       </xsl:otherwise>
     </xsl:choose>
+  </xsl:template>
+  
+  <!-- remove empty mtext or mtable -->
+  <xsl:template match="*[local-name()=('mtext','mtable')]
+                        [not(* or text()[normalize-space()])]
+                        [not(parent::*/local-name() = $wrapper-element-names)]" mode="mml2tex-preprocess">
+    <xsl:apply-templates mode="#current"/>
   </xsl:template>
 
   <xsl:template match="mml:mspace[@class = 'keep-only-if-next-to-mtext']
