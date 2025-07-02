@@ -55,7 +55,7 @@
       <p:pipe port="result" step="get-sre-path"/>
     </p:variable>
     
-    <p:viewport match="mml:math" name="math-view">
+    <p:viewport match="mml:math[not(@alttext)]" name="math-view">
       <p:variable name="args" select="concat('-c ', $lang)"/>
       
       <cx:message>
