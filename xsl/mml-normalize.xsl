@@ -791,7 +791,7 @@
       <xsl:when test="count($new-mathml/*) = 0 and (node() or not(parent::*:math and not(following-sibling::*)))">
         <xsl:message terminate="yes" select="'Unexpected empty result from ', $context, ' (not totally unexpected: it can happen for empty mtext elements)'"/>
       </xsl:when>
-      <xsl:when test="count($new-mathml/*) gt 1 and not($new-mathml/*:mo[matches(.,$parenthesis-regex)])">
+      <xsl:when test="count($new-mathml/*) gt 1 and not(count($new-mathml/*:mo[matches(.,$parenthesis-regex)]) eq 1)">
         <mrow>
           <xsl:apply-templates select="$new-mathml" mode="mml2tex-postprocess-preprocess"/>
         </mrow>
