@@ -337,7 +337,7 @@
        resolve msup with characters that look like a superscript, e.g. degree character -->
   
   <xsl:variable name="superscript-looking-chars" as="xs:string+" 
-                select="'&#x22;', '''', '&#x5e;', '&#x60;', '&#xb0;',  '&#x207a;', '&#x207b;', '&#x207c;', '&#x207d;', '&#x207e;', '&#x207f;'"/>
+                select="'&#x22;', '''', '&#x5e;', '&#x60;', '&#xb0;',  '&#x207a;', '&#x207b;', '&#x207c;', '&#x207d;', '&#x207e;', '&#x207f;',  '&#x2032;'"/>
   
   <xsl:template match="msup[*[2][. = $superscript-looking-chars]]" mode="mml2tex-preprocess" priority="5">
     <mrow>
