@@ -805,8 +805,26 @@
   <!-- remove empty mtext or mtable -->
   <xsl:template match="*[local-name()=('mtext','mtable')]
                         [not(* or text()[normalize-space()])]
-                        [not(parent::*/local-name() = $wrapper-element-names)]" mode="mml2tex-preprocess">
+                        [not(parent::*/local-name() = $wrapper-element-names)] |
+                       mtable[not(mtr)][not(parent::*/local-name() = $wrapper-element-names) or count(*)=1]" mode="mml2tex-preprocess" priority="+1">
     <xsl:apply-templates mode="#current"/>
+  </xsl:template>
+  
+  <xsl:template match="mtable[not(mtr)][not(not(parent::*/local-name() = $wrapper-element-names) or count(*)=1)]" mode="mml2tex-preprocess">
+    <xsl:copy>
+      <xsl:apply-templates select="@*" mode="#current"/>
+      <mtr>
+        <mtd>
+          <xsl:apply-templates mode="#current"/>
+        </mtd>
+      </mtr>
+    </xsl:copy>
+  </xsl:template>
+  
+  <xsl:template match="mtable[@*]/mtable" mode="mml2tex-preprocess">
+    <xsl:copy>
+      <xsl:apply-templates select="parent::mtable/@* | @* | node()" mode="#current"/>
+    </xsl:copy>
   </xsl:template>
 
   <xsl:template match="mml:mspace[@class = 'keep-only-if-next-to-mtext']
