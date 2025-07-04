@@ -76,7 +76,10 @@
   </xsl:template>
   
   <xsl:template match="mfenced/@open | mfenced/@close" mode="mml-to-core">
-    <mo stretchy="true">
+    <mo>
+      <xsl:if test="descendant::*/local-name() = ('mfrac','mover','mroot','msqrt','munder','munderover')">
+        <xsl:attribute name="stretchy" select="'true'"/>
+      </xsl:if>
       <xsl:value-of select="."/>
     </mo>
   </xsl:template>
