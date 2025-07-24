@@ -210,7 +210,7 @@
   <!-- normalize i.e. <mn>0.0</mn><mn>01</mn> to <mn>0.001</mn> -->
   <xsl:template match="math/mn[following-sibling::*[1][self::mn]]
                               [every $a in @* satisfies following-sibling::*[1]/@*[name() = name($a)][. = $a]]
-                              [not(following-sibling::*[2][self::mn])]" mode="mml2tex-preprocess" priority="+10.2">
+                              [not(following-sibling::*[2][self::mn])]" mode="mml2tex-preprocess" priority="+10.3">
     <xsl:copy>
       <xsl:apply-templates select="@*, node(), following-sibling::*[1]/node()" mode="#current"/>
     </xsl:copy>
