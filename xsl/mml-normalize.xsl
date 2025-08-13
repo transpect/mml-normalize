@@ -577,7 +577,8 @@
   
   <!-- wrap private use and non-unicode-characters in mglyph -->
   
-  <xsl:template match="text()[matches(., '[&#xE000;-&#xF8FF;&#xF0000;-&#xFFFFF;&#x100000;-&#x10FFFF;]')]" mode="mml2tex-preprocess">
+  <xsl:template match="text()[matches(., '[&#xE000;-&#xF8FF;&#xF0000;-&#xFFFFF;&#x100000;-&#x10FFFF;]')]
+                             [ancestor::math]" mode="mml2tex-preprocess">
     <xsl:analyze-string select="." regex="[&#xE000;-&#xF8FF;&#xF0000;-&#xFFFFF;&#x100000;-&#x10FFFF;]">
       <xsl:matching-substring>
         <mglyph alt="{.}"/>
