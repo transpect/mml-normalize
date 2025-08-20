@@ -677,6 +677,7 @@
         </xsl:matching-substring>
         <xsl:non-matching-substring>
           <!-- tag operators -->
+
           <xsl:analyze-string select="." regex="{$mml2tex:operators-regex}">
             
             <xsl:matching-substring>
@@ -688,7 +689,6 @@
             <xsl:non-matching-substring>
               
               <xsl:analyze-string select="." regex="{concat('((\s)', $mi-regex, '(\s))|(^(\s?)', $mi-regex, '(\s?)$)|((\s)', $mi-regex, '$)|(^', $mi-regex, '(\s))')}">
-                
                 <!-- tag identifiers -->
                 <xsl:matching-substring>
                   <xsl:variable name="space-before" as="xs:string"
@@ -716,7 +716,7 @@
                 <xsl:non-matching-substring>
 
                   <!-- tag numerical values -->
-                  <xsl:analyze-string select="." regex="[0-9]+">
+                  <xsl:analyze-string select="." regex="[0-9]+(,[0-9]+)*">
                     
                     <xsl:matching-substring>
                       <xsl:element name="{mml:gen-name($parent, 'mn')}">
@@ -725,56 +725,69 @@
                       </xsl:element>
                     </xsl:matching-substring>
                     <xsl:non-matching-substring>
-                      
-                      <!-- tag derivates -->
-                      <xsl:analyze-string select="." regex="([a-zA-Z]+)('+)+">
-                        
+                      <!-- tag spaces -->
+                      <xsl:analyze-string select="." regex="\s+">
                         <xsl:matching-substring>
-                          <xsl:element name="{mml:gen-name($parent, 'mi')}">
-                            <xsl:attribute name="mathvariant" select="$mathvariant"/>
-                            <xsl:apply-templates select="$attributes[not(local-name() eq 'mathvariant')]" mode="#current"/>
-                            <xsl:value-of select="regex-group(1)"/>
-                          </xsl:element>
-                          <xsl:element name="{mml:gen-name($parent, 'mo')}">
-                            <xsl:apply-templates select="$attributes" mode="#current"/>
-                            <xsl:value-of select="regex-group(2)"/>
+                          <xsl:element name="{mml:gen-name($parent, 'mspace')}">
+                            <xsl:attribute name="width" select="'0.16em'"/>
+                            <xsl:value-of select="."/>
                           </xsl:element>
                         </xsl:matching-substring>
                         
                         <xsl:non-matching-substring>
-                          
-                          <!-- tag greeks  -->
-                          <xsl:analyze-string select="." regex="[&#xf0;&#x131;&#x391;-&#x3c9;&#x3d0;-&#x3d2;&#x3d5;]">
-                            
+                        <!-- tag derivates -->
+                          <xsl:analyze-string select="." regex="([a-zA-Z]+)('+)+">
                             <xsl:matching-substring>
+                            
                               <xsl:element name="{mml:gen-name($parent, 'mi')}">
                                 <xsl:attribute name="mathvariant" select="$mathvariant"/>
                                 <xsl:apply-templates select="$attributes[not(local-name() eq 'mathvariant')]" mode="#current"/>
-                                <xsl:value-of select="normalize-space(.)"/>
+                                <xsl:value-of select="regex-group(1)"/>
+                              </xsl:element>
+                              <xsl:element name="{mml:gen-name($parent, 'mo')}">
+                                <xsl:apply-templates select="$attributes" mode="#current"/>
+                                <xsl:value-of select="regex-group(2)"/>
                               </xsl:element>
                             </xsl:matching-substring>
+                        
                             <xsl:non-matching-substring>
-                              <!-- map characters to mi -->
-                              <xsl:choose>
-                                <xsl:when test="string-length(normalize-space(.)) &lt; min((4, $chars-from-which-to-convert-mi-to-mtext))
-                                                and not($current/@xml:space eq 'preserve')
-                                                and not(matches(., $mml2tex:text-char-regex))
-                                                ">
+                              
+                              <!-- tag greeks  -->
+                              <xsl:analyze-string select="." regex="[&#xf0;&#x131;&#x370;-&#x3ff;µ&#x2373;-&#x2375;]+">
+                                
+                                <xsl:matching-substring>
+                                  
                                   <xsl:element name="{mml:gen-name($parent, 'mi')}">
                                     <xsl:attribute name="mathvariant" select="$mathvariant"/>
                                     <xsl:apply-templates select="$attributes[not(local-name() eq 'mathvariant')]" mode="#current"/>
                                     <xsl:value-of select="normalize-space(.)"/>
                                   </xsl:element>
-                                </xsl:when>
-                                <xsl:when test="normalize-space(.)">
-                                  <xsl:element name="{mml:gen-name($parent, 'mtext')}">
-                                    <xsl:apply-templates select="$attributes" mode="#current"/>
-                                    <xsl:value-of select="."/>
-                                  </xsl:element>
-                                </xsl:when>
-                              </xsl:choose>
+                                </xsl:matching-substring>
+                                <xsl:non-matching-substring>
+                                  
+                                  <!-- map characters to mi -->
+                                  <xsl:choose>
+                                    <xsl:when test="string-length(normalize-space(.)) &lt; min((4, $chars-from-which-to-convert-mi-to-mtext))
+                                                    and not($current/@xml:space eq 'preserve')
+                                                    and not(matches(., $mml2tex:text-char-regex))
+                                                    ">
+                                      <xsl:element name="{mml:gen-name($parent, 'mi')}">
+                                        <xsl:attribute name="mathvariant" select="$mathvariant"/>
+                                        <xsl:apply-templates select="$attributes[not(local-name() eq 'mathvariant')]" mode="#current"/>
+                                        <xsl:value-of select="normalize-space(.)"/>
+                                      </xsl:element>
+                                    </xsl:when>
+                                    <xsl:when test="normalize-space(.)">
+                                      <xsl:element name="{mml:gen-name($parent, 'mtext')}">
+                                        <xsl:apply-templates select="$attributes" mode="#current"/>
+                                        <xsl:value-of select="."/>
+                                      </xsl:element>
+                                    </xsl:when>
+                                  </xsl:choose>
+                                </xsl:non-matching-substring>
+                                
+                              </xsl:analyze-string>
                             </xsl:non-matching-substring>
-                            
                           </xsl:analyze-string>
                         </xsl:non-matching-substring>
                       </xsl:analyze-string>
