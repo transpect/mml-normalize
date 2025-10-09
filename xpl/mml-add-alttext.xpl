@@ -8,7 +8,7 @@
   version="1.0"
   name="mml-add-alttext"
   type="tr:mml-add-alttext">
-  
+
   <p:documentation>
     This step takes XML documents with MathML and 
     adds to each MathML equation an alt text attribute.
@@ -19,15 +19,16 @@
       Expects an arbitrary XML document with MathML equations
     </p:documentation>
   </p:input>  
-    
+  
   <p:output port="result">
     <p:documentation>
       The input document with @alttext attributes added
     </p:documentation>
   </p:output>
-
+  
   <p:option name="lang" select="'en'"/>
   <p:option name="sre-path" select="'/home/wbdvadmin/node_modules/speech-rule-engine/bin/sre'"/>
+  <p:option name="insert-tr-processing-attr" select="'yes'"/>
   
   <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
   <p:import href="http://transpect.io/xproc-util/file-uri/xpl/file-uri.xpl"/>
@@ -54,13 +55,13 @@
     <p:variable name="run" select="/c:result/@os-path">
       <p:pipe port="result" step="get-sre-path"/>
     </p:variable>
+    <p:variable name="args" select="concat('-c ', $lang)"/>
+    
+    <cx:message>
+      <p:with-option name="message" select="concat('[info]: run SRE: ', $run, ' ', $args)"/>
+    </cx:message>
     
     <p:viewport match="mml:math[not(@alttext)]" name="math-view">
-      <p:variable name="args" select="concat('-c ', $lang)"/>
-      
-      <cx:message>
-        <p:with-option name="message" select="concat('[info]: run SRE: ', $run, ' ', $args)"/>
-      </cx:message>
       
       <!-- the equation is passed to stdin -->
       
@@ -82,14 +83,30 @@
               <p:pipe port="result" step="get-alttext"/>
             </p:with-option>
           </p:add-attribute>
+          <p:choose>
+            <p:when test="$insert-tr-processing-attr = 'yes'">
+              <p:add-attribute match="mml:math" attribute-name="tr:alttext" attribute-value="ok"/>
+            </p:when>
+            <p:otherwise>
+              <p:identity/>
+            </p:otherwise>
+          </p:choose>
         </p:group>
         <p:catch>
           
-          <p:add-attribute match="mml:math" attribute-name="tr:alttext" attribute-value="failed">
+          <p:identity>
             <p:input port="source">
               <p:pipe port="current" step="math-view"/>
             </p:input>
-          </p:add-attribute>          
+          </p:identity>
+          <p:choose>
+            <p:when test="$insert-tr-processing-attr = 'yes'">
+              <p:add-attribute match="mml:math" attribute-name="tr:alttext" attribute-value="failed"/>
+            </p:when>
+            <p:otherwise>
+              <p:identity/>
+            </p:otherwise>
+          </p:choose>
           
         </p:catch>
       </p:try>
