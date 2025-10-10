@@ -139,8 +139,7 @@
           </p:identity>
           <p:choose>
             <p:when test="$insert-tr-processing-attr = 'yes'">
-              <p:add-attribute match="mml:math" attribute-name="tr:alttext" attribute-value="ok"/>
-              <p:add-attribute match="mml:math" attribute-name="alttext" attribute-value="fake-alttext-for-test"/>
+              <p:add-attribute match="mml:math" attribute-name="tr:alttext" attribute-value="failed"/>
             </p:when>
             <p:otherwise>
               <p:identity/>
