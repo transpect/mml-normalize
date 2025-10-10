@@ -20,10 +20,17 @@
     </p:documentation>
   </p:input>  
   
-  <p:output port="result">
+  <p:output port="result" primary="true">
     <p:documentation>
       The input document with @alttext attributes added
     </p:documentation>
+  </p:output>
+  
+  <p:output port="processing-info" primary="false">
+    <p:documentation>
+      Processing info ('version-nr' children element: used SRE version number)
+    </p:documentation>
+    <p:pipe step="processing-info" port="result"/>
   </p:output>
   
   <p:option name="lang" select="'en'"/>
@@ -45,13 +52,44 @@
   
   <p:sink/>
   
+  <p:group name="processing-info">
+    <p:output port="result"/>
+    <p:variable name="run" select="/c:result/@os-path">
+      <p:pipe port="result" step="get-sre-path"/>
+    </p:variable>
+    <p:try>
+      <p:group>
+        <p:exec result-is-xml="false" errors-is-xml="false" wrap-result-lines="true" name="get-sre-version">
+          <p:input port="source">
+            <p:empty/>
+          </p:input>
+          <p:with-option name="command" select="$run"/>
+          <p:with-option name="args" select="'-V'"/>
+        </p:exec>
+        <p:rename match="c:result" new-name="version-nr"/>
+        <p:wrap match="version-nr" wrapper="c:result"/>
+      </p:group>
+      <p:catch>
+        <p:identity>
+          <p:input port="source">
+            <p:inline>
+              <c:result><version-nr>undefined</version-nr></c:result>  
+            </p:inline>  
+          </p:input>
+        </p:identity>
+      </p:catch>
+    </p:try>
+    </p:group>
+  
+  <p:sink/>
+  
   <p:identity>
     <p:input port="source">
       <p:pipe port="source" step="mml-add-alttext"/>
     </p:input>
   </p:identity>
   
-  <p:group>
+  <p:group name="main">
     <p:variable name="run" select="/c:result/@os-path">
       <p:pipe port="result" step="get-sre-path"/>
     </p:variable>
@@ -101,7 +139,8 @@
           </p:identity>
           <p:choose>
             <p:when test="$insert-tr-processing-attr = 'yes'">
-              <p:add-attribute match="mml:math" attribute-name="tr:alttext" attribute-value="failed"/>
+              <p:add-attribute match="mml:math" attribute-name="tr:alttext" attribute-value="ok"/>
+              <p:add-attribute match="mml:math" attribute-name="alttext" attribute-value="fake-alttext-for-test"/>
             </p:when>
             <p:otherwise>
               <p:identity/>
