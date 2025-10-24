@@ -308,11 +308,12 @@
     <xsl:apply-templates select="*[1]" mode="#current"/>
   </xsl:template>
   
-  <!-- https://mantis.le-tex.de/view.php?id=37994
+  <!-- https://mantis.le-tex.de/view.php?id=37994, 
+       https://mantis.le-tex.de/view.php?id=41181
        fix msub/msub where base is an mspace -->
   
   <xsl:template match="*[local-name() = ('msub', 'msup')]
-                        [*[1][self::mspace or self::mrow[count(*) = 1][mspace]]]" mode="mml2tex-preprocess">
+                        [*[1][self::mspace or self::mrow[count(*) = 1][mspace]]]" mode="mml2tex-preprocess" priority="5">
     <xsl:copy>
       <xsl:apply-templates select="@*" mode="#current"/>
       <xsl:apply-templates select="preceding-sibling::*[1]" mode="move-into-msub-or-msup"/>
@@ -322,11 +323,12 @@
   
   <xsl:template match="*[local-name() = ('msub', 'msup')]
                         [*[1][self::mspace or self::mrow[count(*) = 1][mspace]]]/*[1]
-                      |*[following-sibling::msup
-                        [*[1][self::mspace or self::mrow[count(*) = 1][mspace]]]
-                        [not(*[2] = $superscript-looking-chars)]]" mode="mml2tex-preprocess"/>
-  
-  
+                      |*[local-name() = ('msub', 'msup')]
+                        [following-sibling::msup
+                        [*[1][self::mspace or self::mrow[count(*) = 1][mspace]]]  
+                        [not(*[2] = $superscript-looking-chars)]]" mode="mml2tex-preprocess">
+  </xsl:template>
+
   <xsl:template match="*" mode="move-into-msub-or-msup">
     <xsl:copy>
       <xsl:apply-templates select="@*, node()" mode="mml2tex-preprocess"/>
