@@ -535,6 +535,29 @@
       </xsl:for-each>
     </xsl:copy>
   </xsl:template>
+  
+  <!--  clean up tables -->
+  <xsl:template match="mtable[count(mtr) eq 1]" mode="mml2tex-preprocess" >
+    <xsl:apply-templates select="mtr/mtd/node()" mode="#current">
+      <xsl:with-param name="dissolved-table" select="true()" tunnel="yes"/>
+    </xsl:apply-templates>
+  </xsl:template>
+  
+  <!-- add spaces around texts-->
+  <xsl:template match="mtext[ancestor::mtable[count(mtr) eq 1]]"  mode="mml2tex-preprocess" priority="12">
+    <xsl:param name="dissolved-table" tunnel="yes"/>
+    <xsl:if test="preceding::*[1][self::mn or self::mo or self::mi]
+                  and $dissolved-table">
+      <mspace xmlns="http://www.w3.org/1998/Math/MathML" width="0.25em"/>
+    </xsl:if>
+    <xsl:copy>
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+    </xsl:copy>
+    <xsl:if test="following::*[1][self::mn or self::mo or self::mi]
+                  and $dissolved-table">
+      <mspace xmlns="http://www.w3.org/1998/Math/MathML" width="0.25em"/>
+    </xsl:if>
+  </xsl:template>
 
   <xsl:template match="*[local-name() = ('mo', 'mi', 'mtext', 'mn')]
                         [matches(., concat('^', $mml2tex:functions-names-regex, '\d+([,\.]\d+)*$'))]" mode="mml2tex-preprocess">
