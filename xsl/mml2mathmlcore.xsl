@@ -31,7 +31,7 @@
         </xsl:when>
         <xsl:otherwise>
           <mo>
-            <xsl:if test="descendant::*/local-name() = ('mfrac','mover','mroot','msqrt','munder','munderover')">
+            <xsl:if test="descendant::*/local-name() = ('mfrac','mover','mroot','msqrt','munder','munderover','mtable')">
               <xsl:attribute name="stretchy" select="'true'"/>
             </xsl:if>
             <xsl:value-of select="'('"/>
@@ -65,7 +65,7 @@
         </xsl:when>
         <xsl:otherwise>
           <mo>
-            <xsl:if test="descendant::*/local-name() = ('mfrac','mover','mroot','msqrt','munder','munderover')">
+            <xsl:if test="descendant::*/local-name() = ('mfrac','mover','mroot','msqrt','munder','munderover','mtable')">
               <xsl:attribute name="stretchy" select="'true'"/>
             </xsl:if>
             <xsl:value-of select="')'"/>
@@ -77,7 +77,7 @@
   
   <xsl:template match="mfenced/@open | mfenced/@close" mode="mml-to-core">
     <mo>
-      <xsl:if test="descendant::*/local-name() = ('mfrac','mover','mroot','msqrt','munder','munderover')">
+      <xsl:if test="parent::mfenced/descendant::*/local-name() = ('mfrac','mover','mroot','msqrt','munder','munderover','mtable')">
         <xsl:attribute name="stretchy" select="'true'"/>
       </xsl:if>
       <xsl:value-of select="."/>
