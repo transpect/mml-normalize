@@ -537,7 +537,8 @@
   </xsl:template>
   
   <!--  clean up tables -->
-  <xsl:template match="mtable[count(mtr) eq 1]" mode="mml2tex-preprocess" >
+  <xsl:template match="mtable[count(mtr) eq 1]
+                             [not(ancestor::mrow)]" mode="mml2tex-preprocess" >
     <xsl:apply-templates select="mtr/mtd/node()" mode="#current">
       <xsl:with-param name="dissolved-table" select="true()" tunnel="yes"/>
     </xsl:apply-templates>
