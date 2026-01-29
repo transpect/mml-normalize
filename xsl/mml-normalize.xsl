@@ -321,13 +321,15 @@
     </xsl:copy>
   </xsl:template>
   
-  <xsl:template match="*[local-name() = ('msub', 'msup')]
+  <xsl:template match="*[following-sibling::msup
+                        [*[1][self::mspace or self::mrow[count(*) = 1][mspace]]]
+                        [not(*[2] = $superscript-looking-chars)]]
+                      |*[local-name() = ('msub', 'msup')]
                         [*[1][self::mspace or self::mrow[count(*) = 1][mspace]]]/*[1]
                       |*[local-name() = ('msub', 'msup')]
                         [following-sibling::msup
                         [*[1][self::mspace or self::mrow[count(*) = 1][mspace]]]  
-                        [not(*[2] = $superscript-looking-chars)]]" mode="mml2tex-preprocess">
-  </xsl:template>
+                        [not(*[2] = $superscript-looking-chars)]]" mode="mml2tex-preprocess"/>
 
   <xsl:template match="*" mode="move-into-msub-or-msup">
     <xsl:copy>
