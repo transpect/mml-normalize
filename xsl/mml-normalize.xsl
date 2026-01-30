@@ -321,7 +321,7 @@
     </xsl:copy>
   </xsl:template>
   
-  <xsl:template match="*[following-sibling::msup
+  <xsl:template match="*[following-sibling::*[1][self::msup]
                         [*[1][self::mspace or self::mrow[count(*) = 1][mspace]]]
                         [not(*[2] = $superscript-looking-chars)]]
                       |*[local-name() = ('msub', 'msup')]
