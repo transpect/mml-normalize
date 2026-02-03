@@ -541,13 +541,14 @@
   <!--  clean up tables -->
   <xsl:template match="mtable[count(mtr) eq 1]
                              [not(parent::mrow[mo[@stretchy]])]" mode="mml2tex-preprocess" >
-    <xsl:apply-templates select="mtr/mtd/node()" mode="#current">
+    <xsl:apply-templates select="mtr/mtd/*" mode="#current">
       <xsl:with-param name="dissolved-table" select="true()" tunnel="yes"/>
     </xsl:apply-templates>
   </xsl:template>
   
-  <!-- add spaces around texts-->
-  <xsl:template match="mtext[ancestor::mtable[count(mtr) eq 1]]"  mode="mml2tex-preprocess" priority="12">
+  <!-- add spaces around texts.
+       fixed: https://mantis.le-tex.de/view.php?id=41904-->
+  <xsl:template match="mtext[parent::mtable[count(mtr) eq 1]]"  mode="mml2tex-preprocess" priority="12">
     <xsl:param name="dissolved-table" tunnel="yes"/>
     <xsl:if test="preceding::*[1][self::mn or self::mo or self::mi]
                   and $dissolved-table">
