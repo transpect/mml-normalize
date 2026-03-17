@@ -468,6 +468,43 @@
     <xsl:apply-templates select="mrow/*[position() gt 1]" mode="#current"/>
   </xsl:template>
   
+  <!-- reorder mmultiscripts if base is set by msup/msub (MS Word equation editor)
+      <mmultiscripts>
+         <mi>X</mi> <!-\- base expression -\->
+         <mi>a</mi> <!-\- post-sub-script -\->
+         <mi>b</mi> <!-\- post-sup-script -\->
+         <mprescripts />
+         <mi>c</mi> <!-\- pre-sub-script -\->
+         <mi>d</mi> <!-\- pre-sup-script -\->
+       </mmultiscripts>-->
+       
+  <xsl:template match="mmultiscripts[*[1][self::msub]][mprescripts]" mode="mml2tex-preprocess">
+    <xsl:copy>
+      <xsl:apply-templates select="*[1][self::msub]/*[1]" mode="#current"/>
+      <xsl:apply-templates select="*[1][self::msub]/*[2]" mode="#current"/>
+      <mspace xmlns="http://www.w3.org/1998/Math/MathML"/>
+      <xsl:apply-templates select="node() except *[1][self::msub]" mode="#current"/>
+    </xsl:copy>
+  </xsl:template>
+  
+  <xsl:template match="mmultiscripts[*[1][self::msup]][mprescripts]" mode="mml2tex-preprocess">
+    <xsl:copy>
+      <xsl:apply-templates select="*[1][self::msup]/*[1]" mode="#current"/>
+      <mspace xmlns="http://www.w3.org/1998/Math/MathML"/>
+      <xsl:apply-templates select="*[1][self::msup]/*[2]" mode="#current"/>
+      <xsl:apply-templates select="node() except *[1][self::msub]" mode="#current"/>
+    </xsl:copy>
+  </xsl:template>
+  
+  <xsl:template match="msub[*[1][self::mmultiscripts][mprescripts]]" mode="mml2tex-preprocess">
+    <mmultiscripts xmlns="http://www.w3.org/1998/Math/MathML">
+      <xsl:apply-templates select="*[1][self::mmultiscripts]/*[1]" mode="#current"/>
+      <xsl:apply-templates select="*[2]" mode="#current"/>
+      <mspace xmlns="http://www.w3.org/1998/Math/MathML"/>
+      <xsl:apply-templates select="*[1][self::mmultiscripts]/*[position() gt 1]" mode="#current"/>
+    </mmultiscripts>
+  </xsl:template>
+  
   <xsl:template match="mtd[maligngroup]" mode="mml2tex-preprocess">
     <xsl:variable name="cur" select="." as="element()"/>
     <xsl:if test="$cur/*[1]/self::maligngroup and ../../mtr/mtd[not(*[1]/self::maligngroup)]">
