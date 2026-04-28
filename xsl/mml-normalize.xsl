@@ -51,7 +51,9 @@
     <xsl:copy>
       <xsl:apply-templates select="@*" mode="#current"/>
       <xsl:for-each-group select="*" 
-        group-adjacent="concat(local-name(),
+        group-adjacent="concat(if(self::mo[matches(., '^\p{Zs}')] and (preceding-sibling::*[1][self::mtext] or following-sibling::*[1][self::mtext])) 
+                               then 'mtext' 
+                               else local-name(),
                                string-join(for $i in @* except (@xml:space|@width) 
                                            return concat($i/local-name(), $i), '-'),
                                matches(., concat('^[\p{L}\p{P}', $whitespace-regex, ']+$'), 'i') or self::mspace[not(@linebreak)],
@@ -60,9 +62,10 @@
                                )">
           <xsl:choose>
             <xsl:when test="current-group()/self::mi[every $i in 1 to ($chars-from-which-to-convert-mi-to-mtext - 1) 
-                                                     satisfies following-sibling::*[$i]/local-name() eq 'mi']">
+                                                     satisfies following-sibling::*[$i]/local-name() eq 'mi']
+                                                     ">
               <xsl:element name="mtext">
-              <xsl:attribute name="mathvariant" select="(@mathvariant, 'italic')[1]"/>
+                <xsl:attribute name="mathvariant" select="(@mathvariant, 'italic')[1]"/>
                 <xsl:if test="not(every $i in current-group()/@mathvariant 
                                   satisfies $i eq 'normal')">
                   <xsl:attribute name="mathvariant" select="(@mathvariant, 'italic')[1]"/>
