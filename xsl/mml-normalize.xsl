@@ -438,7 +438,7 @@
   <!-- repair msup/msub with more than two child elements. We assume the last node was superscripted/subscripted -->
 
   <xsl:template match="msup[count(*) gt 2]
-		         |msub[count(*) gt 2]" mode="mml2tex-preprocess">
+		                  |msub[count(*) gt 2]" mode="mml2tex-preprocess">
     <xsl:copy>
       <xsl:apply-templates select="@*" mode="#current"/>
       <mrow xmlns="http://www.w3.org/1998/Math/MathML">
@@ -666,7 +666,7 @@
                                ')|([a-zA-Z&#x391;-&#x3f6;])'
                                ,')')"/>
   
-  <xsl:template match="mtext[matches(., concat('^\s*', $mi-regex, '\s*$'))]" mode="mml2tex-preprocess">
+  <xsl:template match="mtext[matches(., concat('^\p{Zs}*', $mi-regex, '\p{Zs}*$'))]" mode="mml2tex-preprocess">
     <xsl:element name="{mml:gen-name(parent::*, 'mi')}">
       <xsl:attribute name="mathvariant" select="'normal'"/>
       <xsl:apply-templates select="@*" mode="#current"/>
@@ -674,7 +674,7 @@
     </xsl:element>
   </xsl:template>
   
-  <xsl:template match="mtext[matches(., '^\s*[0-9]+\s*$')]" mode="mml2tex-preprocess">
+  <xsl:template match="mtext[matches(., '^\p{Zs}*[0-9]+\p{Zs}*$')]" mode="mml2tex-preprocess">
     <xsl:element name="{mml:gen-name(parent::*, 'mn')}">
       <xsl:apply-templates select="@*" mode="#current"/>
       <xsl:value-of select="normalize-space(.)"/>
@@ -695,7 +695,7 @@
       It shouldn’t matter because they have the same effect. Only to avoid the warning. -->
   </xsl:template>
   
-  <xsl:template match="mtext[matches(., concat('^\s*', $mml2tex:operators-regex, '\s*$'))]
+  <xsl:template match="mtext[matches(., concat('^\p{Zs}*', $mml2tex:operators-regex, '\p{Zs}*$'))]
                             [not(matches(., concat('^[', $whitespace-regex, ']+$')))]" mode="mml2tex-preprocess">
     <xsl:element name="{mml:gen-name(parent::*, 'mo')}">
       <xsl:apply-templates select="@*" mode="#current"/>
@@ -718,7 +718,7 @@
                                          concat('^[', $whitespace-regex, ']+$')) 
                                  or processing-instruction())]" 
                 mode="mml2tex-preprocess" priority="10">
-    <xsl:param name="regular-words-regex" select="'(\p{L}\p{L}+)([-\s]\p{L}\p{L}+)+\s*'" as="xs:string" tunnel="yes"/>
+    <xsl:param name="regular-words-regex" select="'(\p{L}\p{L}+)([-\p{Zs}]\p{L}\p{L}+)+\p{Zs}*'" as="xs:string" tunnel="yes"/>
     <!-- prevent some characters from faulty rendering
       e.g. a legitimate en-dash = - - = would become visible double-minus 
     => keep it as mtext, hopefully becomes \text environment -->
