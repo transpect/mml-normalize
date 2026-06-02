@@ -96,6 +96,16 @@
       
     </xsl:copy>
   </xsl:template>
+  
+  <!-- https://mantis.le-tex.de/view.php?id=42471
+       Render regular dashes as mtext, as it indicates that 
+       the character is intended to be a textual hyphen or a dash. -->
+  
+  <xsl:template match="mo[@mathvariant eq 'normal'][matches(., '^\p{Pd}$')]" mode="mml2tex-preprocess">
+    <mtext>
+      <xsl:apply-templates select="@* except @mathvariant, node()" mode="#current"/>
+    </mtext>
+  </xsl:template>
 
   <!-- handle splitted mtext in mrow, example: <mrow>
          <mtext>„</mtext><mtext>neoklassischer Wicksell-Effekt</mtext><mtext>“</mtext>
