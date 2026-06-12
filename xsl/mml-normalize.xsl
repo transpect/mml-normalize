@@ -220,17 +220,18 @@
     </msub>
   </xsl:template>
 
-  <!-- normalize i.e. <mn>0.0</mn><mn>01</mn> to <mn>0.001</mn> -->
+  <!-- normalize i.e. <mn>0.0</mn><mn>01</mn>         to <mn>0.001</mn>
+                      <mn>7</mn><mn>85</mn><mn>0</mn> to <mn>7850</mn> -->
   <xsl:template match="math/mn[following-sibling::*[1][self::mn]]
-                              [every $a in @* satisfies following-sibling::*[1]/@*[name() = name($a)][. = $a]]
-                              [not(following-sibling::*[2][self::mn])]" mode="mml2tex-preprocess" priority="+10.3">
+                              [not(preceding-sibling::*[1][self::mn][every $a in @* satisfies following-sibling::*[1]/@*[name() = name($a)][. = $a]])]
+                              [every $a in @* satisfies following-sibling::*[1]/@*[name() = name($a)][. = $a]]" mode="mml2tex-preprocess" priority="+10.3">
     <xsl:copy>
-      <xsl:apply-templates select="@*, node(), following-sibling::*[1]/node()" mode="#current"/>
+      <xsl:variable name="last-sibling-mn-with-same-atts" select="following-sibling::*[not(self::mn) or self::mn[not(every $a in current()/@* satisfies preceding-sibling::*[1]/@*[name() = name($a)][. = $a])]][1]"/>
+      <xsl:apply-templates select="@*, (., following-sibling::*[1] union following-sibling::*[. &lt;&lt; $last-sibling-mn-with-same-atts])/node()" mode="#current"/>
     </xsl:copy>
   </xsl:template>
   <xsl:template match="math/mn[preceding-sibling::*[1][self::mn]]
-                              [every $a in @* satisfies preceding-sibling::*[1]/@*[name() = name($a)][. = $a]]
-                              [not(preceding-sibling::*[2][self::mn])]" mode="mml2tex-preprocess" priority="+10.2"/>
+                              [every $a in @* satisfies preceding-sibling::*[1]/@*[name() = name($a)][. = $a]]" mode="mml2tex-preprocess" priority="+10.2"/>
   
   <!-- resolve munder if underscript is empty -->
   
