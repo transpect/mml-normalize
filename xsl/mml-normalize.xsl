@@ -227,7 +227,7 @@
                               [every $a in @* satisfies following-sibling::*[1]/@*[name() = name($a)][. = $a]]" mode="mml2tex-preprocess" priority="+10.3">
     <xsl:copy>
       <xsl:variable name="last-sibling-mn-with-same-atts" select="following-sibling::*[not(self::mn) or self::mn[not(every $a in current()/@* satisfies preceding-sibling::*[1]/@*[name() = name($a)][. = $a])]][1]"/>
-      <xsl:apply-templates select="@*, (., following-sibling::*[1] union following-sibling::*[. &lt;&lt; $last-sibling-mn-with-same-atts])/node()" mode="#current"/>
+      <xsl:apply-templates select="@*, (., following-sibling::*[1] union following-sibling::*[. &lt;&lt; $last-sibling-mn-with-same-atts or empty($last-sibling-mn-with-same-atts)])/node()" mode="#current"/>
     </xsl:copy>
   </xsl:template>
   <xsl:template match="math/mn[preceding-sibling::*[1][self::mn]]
