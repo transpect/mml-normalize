@@ -467,6 +467,9 @@
     </mrow>
   </xsl:template>
   
+  <xsl:template match="mi[matches(., '^''+$')][@mathvariant='normal']
+                         [parent::*/*[1][not(@mathvariant)]]/@mathvariant" mode="mml2tex-preprocess"/>
+  
   <!-- resolve nested mmultiscripts when authors put tensors in the base of tensors by accident (MS Word equation editor) -->
   
   <xsl:template match="mmultiscripts/mrow[mmultiscripts]" mode="mml2tex-preprocess">
